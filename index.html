@@ -3,38 +3,141 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ONA — SQLite Matchmaker Engine</title>
+<title>ONA — Care that feels human.</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,300;0,400;1,300;1,400&family=Syne:wght@300;400;500;700&display=swap" rel="stylesheet">
-<!-- SQL.js betöltése SQLite-hoz -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/sql-wasm.js"></script>
 <style>
-/* ... (A CSS dizájn pontosan ugyanaz marad, mint az előző verzióban) ... */
 *{margin:0;padding:0;box-sizing:border-box}
-:root{ --bg:#FDFCF9; --bg2:#F8F5EF; --surface:#F2EDE4; --surface2:#EDE7DC; --gold:#9B7A3E; --gold2:#B8943A; --gold-dim:#C4A86A; --text:#1A1410; --text2:#6B5E4E; --text3:#A8998A; --line:rgba(155,122,62,0.18); --line2:rgba(155,122,62,0.1); }
-body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;font-weight:300;overflow-x:hidden}
-nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:28px 60px;display:flex;justify-content:space-between;align-items:center;background:rgba(253,252,249,0.95);border-bottom:1px solid var(--line2)}
+:root{
+  --bg:#FDFCF9;
+  --bg2:#F8F5EF;
+  --surface:#F2EDE4;
+  --surface2:#EDE7DC;
+  --gold:#9B7A3E;
+  --gold2:#B8943A;
+  --gold-dim:#C4A86A;
+  --text:#1A1410;
+  --text2:#6B5E4E;
+  --text3:#A8998A;
+  --line:rgba(155,122,62,0.18);
+  --line2:rgba(155,122,62,0.1);
+  --red:#8B3A2A;
+  --green:#3A6B4A;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;font-weight:300;overflow-x:hidden;cursor:none}
+
+/* CURSOR */
+#cursor{position:fixed;width:8px;height:8px;background:var(--gold);border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);transition:transform 0.1s,opacity 0.3s}
+#cursor-ring{position:fixed;width:40px;height:40px;border:1px solid rgba(200,169,110,0.4);border-radius:50%;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:all 0.15s ease;mix-blend-mode:normal}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:28px 60px;display:flex;justify-content:space-between;align-items:center;mix-blend-mode:normal}
+nav::after{content:'';position:absolute;inset:0;background:linear-gradient(to bottom,rgba(253,252,249,0.96) 0%,transparent 100%);z-index:-1;pointer-events:none}
 .nav-logo{font-family:'Playfair Display',serif;font-size:22px;font-weight:300;letter-spacing:0.3em;color:var(--gold);text-transform:uppercase}
-.nav-btn{border:1px solid var(--gold-dim);padding:10px 28px;font-size:11px;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold);background:transparent;cursor:pointer;transition:all 0.3s;font-family:'Syne',sans-serif}
-.nav-btn.operator{border-color:var(--text);color:var(--text)}
-.nav-btn.operator:hover{background:var(--text);color:var(--bg)}
-.matchmaker{padding:140px 80px 80px;background:var(--surface);min-height:100vh}
-.match-header{text-align:center;margin-bottom:60px}
-.section-num{font-size:10px;letter-spacing:0.3em;color:var(--text3);margin-bottom:16px;text-transform:uppercase}
-.section-title{font-family:'Playfair Display',serif;font-size:clamp(38px,4vw,56px);font-weight:300;color:var(--text);line-height:1.05}
+.nav-right{display:flex;gap:40px;align-items:center}
+.nav-link{font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:var(--text2);text-decoration:none;transition:color 0.3s}
+.nav-link:hover{color:var(--gold)}
+.nav-btn{border:1px solid var(--gold-dim);padding:10px 28px;font-size:11px;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold);background:transparent;cursor:none;transition:all 0.3s;font-family:'Syne',sans-serif}
+.nav-btn:hover{background:var(--gold);color:var(--bg)}
+.nav-btn.op-btn{border-color:var(--text);color:var(--text);}
+.nav-btn.op-btn:hover{background:var(--text);color:var(--bg);}
+
+/* HERO */
+.hero{height:100vh;display:grid;grid-template-columns:1fr 1fr;position:relative;overflow:hidden}
+.hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 60% 80% at 70% 50%,rgba(155,122,62,0.05) 0%,transparent 70%)}
+.hero-lines{position:absolute;inset:0;overflow:hidden;opacity:0.3}
+.hero-lines::before,.hero-lines::after{content:'';position:absolute;width:1px;top:0;bottom:0;background:linear-gradient(to bottom,transparent,var(--gold-dim) 30%,var(--gold-dim) 70%,transparent)}
+.hero-lines::before{left:33.33%}
+.hero-lines::after{left:66.66%}
+
+.hero-left{display:flex;flex-direction:column;justify-content:center;padding:120px 80px 80px 80px;position:relative;z-index:2}
+.hero-eyebrow{font-size:10px;letter-spacing:0.35em;text-transform:uppercase;color:var(--gold);margin-bottom:32px;display:flex;align-items:center;gap:16px;opacity:0;animation:fadeUp 1s 0.3s forwards}
+.hero-eyebrow::before{content:'';width:48px;height:1px;background:var(--gold)}
+.hero-h1{font-family:'Playfair Display',serif;font-size:clamp(52px,5.5vw,80px);font-weight:300;line-height:1.0;color:var(--text);margin-bottom:8px;opacity:0;animation:fadeUp 1s 0.5s forwards}
+.hero-h1 em{font-style:italic;color:var(--gold)}
+.hero-tagline{font-family:'Playfair Display',serif;font-size:clamp(18px,2vw,26px);font-style:italic;color:var(--text2);margin:20px 0 52px;opacity:0;animation:fadeUp 1s 0.7s forwards;font-weight:300}
+.hero-ctas{display:flex;gap:16px;opacity:0;animation:fadeUp 1s 0.9s forwards}
+.btn-gold{background:var(--gold);color:var(--bg);border:none;padding:16px 40px;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;cursor:none;transition:all 0.3s;font-family:'Syne',sans-serif;font-weight:500}
+.btn-gold:hover{background:var(--gold2)}
+.btn-outline{border:1px solid var(--text3);background:transparent;color:var(--text2);padding:16px 40px;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;cursor:none;transition:all 0.3s;font-family:'Syne',sans-serif}
+.btn-outline:hover{border-color:var(--gold);color:var(--gold)}
+
+.hero-right{display:flex;flex-direction:column;justify-content:center;padding:120px 80px 80px 40px;position:relative;z-index:2;border-left:1px solid var(--line2)}
+.hero-services{display:flex;flex-direction:column;gap:1px;opacity:0;animation:fadeIn 1s 1.1s forwards}
+.hero-svc{padding:24px 32px;border:1px solid var(--line2);position:relative;overflow:hidden;transition:all 0.4s;cursor:none}
+.hero-svc::before{content:'';position:absolute;left:0;top:0;bottom:0;width:0;background:var(--gold);transition:width 0.4s}
+.hero-svc:hover{border-color:var(--line);padding-left:44px}
+.hero-svc:hover::before{width:3px}
+.svc-num{font-size:10px;color:var(--text3);letter-spacing:0.2em;margin-bottom:6px}
+.svc-title{font-family:'Playfair Display',serif;font-size:20px;font-weight:300;color:var(--text);margin-bottom:4px}
+.svc-sub{font-size:11px;color:var(--text2);letter-spacing:0.06em}
+.hero-scroll{position:absolute;bottom:40px;left:80px;display:flex;align-items:center;gap:16px;opacity:0;animation:fadeIn 1s 1.4s forwards}
+.scroll-line{width:48px;height:1px;background:var(--text3);position:relative;overflow:hidden}
+.scroll-line::after{content:'';position:absolute;inset:0;background:var(--gold);animation:scrollAnim 2s 2s infinite}
+.scroll-text{font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:var(--text3)}
+
+/* MARQUEE */
+.marquee-wrap{padding:20px 0;border-top:1px solid var(--line2);border-bottom:1px solid var(--line2);overflow:hidden;white-space:nowrap;background:var(--surface)}
+.marquee-inner{display:inline-flex;gap:0;animation:marquee 20s linear infinite}
+.marquee-item{display:inline-flex;align-items:center;gap:32px;padding:0 32px;font-size:11px;letter-spacing:0.15em;text-transform:uppercase;color:var(--text3)}
+.marquee-dot{width:4px;height:4px;border-radius:50%;background:var(--gold);flex-shrink:0}
+
+/* MANIFESTO */
+.manifesto{padding:160px 80px;position:relative;overflow:hidden}
+.manifesto-grid{display:grid;grid-template-columns:1fr 2fr;gap:120px;align-items:start}
+.manifesto-label{font-size:10px;letter-spacing:0.3em;text-transform:uppercase;color:var(--gold);margin-bottom:24px}
+.manifesto-side-text{font-size:13px;color:var(--text2);line-height:1.9;max-width:220px}
+.manifesto-quote{font-family:'Playfair Display',serif;font-size:clamp(32px,4vw,56px);font-weight:300;line-height:1.15;color:var(--text);margin-bottom:48px}
+.manifesto-quote em{font-style:italic;color:var(--gold)}
+.manifesto-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line2)}
+.stat-box{background:var(--bg2);padding:32px 24px}
+.stat-n{font-family:'Playfair Display',serif;font-size:42px;font-weight:300;color:var(--gold);line-height:1}
+.stat-l{font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:var(--text3);margin-top:8px}
+.manifesto-deco{position:absolute;right:-100px;top:50%;transform:translateY(-50%);font-family:'Playfair Display',serif;font-size:320px;font-weight:300;color:rgba(155,122,62,0.04);pointer-events:none;letter-spacing:-0.05em;line-height:1}
+
+/* SERVICES */
+.services{padding:0 0 160px}
+.services-header{padding:0 80px 80px;display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:end;border-bottom:1px solid var(--line2)}
+.section-num{font-size:10px;letter-spacing:0.3em;color:var(--text3);margin-bottom:16px;text-transform:uppercase;}
+.section-title{font-family:'Playfair Display',serif;font-size:clamp(38px,4.5vw,64px);font-weight:300;color:var(--text);line-height:1.05}
 .section-title em{font-style:italic;color:var(--gold)}
-.match-grid{display:grid;grid-template-columns:400px 1fr;gap:60px;max-width:1200px;margin:0 auto}
+.section-desc{font-size:14px;color:var(--text2);line-height:1.9;align-self:end;padding-bottom:8px}
+
+.svc-tabs{display:flex;border-bottom:1px solid var(--line2);padding:0 80px;gap:0}
+.svc-tab{padding:24px 32px 24px 0;margin-right:32px;font-size:11px;letter-spacing:0.15em;text-transform:uppercase;color:var(--text3);cursor:none;border-bottom:1px solid transparent;margin-bottom:-1px;transition:all 0.3s;background:none;border-top:none;border-left:none;border-right:none;font-family:'Syne',sans-serif}
+.svc-tab.active{color:var(--gold);border-bottom-color:var(--gold)}
+.svc-tab:hover{color:var(--text2)}
+
+.svc-panels{padding:80px 80px 0}
+.svc-panel{display:none;grid-template-columns:1fr 1fr;gap:80px;align-items:start}
+.svc-panel.active{display:grid}
+.svc-icon-big{width:72px;height:72px;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:32px;margin-bottom:40px;color:var(--gold)}
+.svc-panel-name{font-family:'Playfair Display',serif;font-size:48px;font-weight:300;color:var(--text);line-height:1;margin-bottom:12px}
+.svc-panel-tag{font-size:11px;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold);margin-bottom:28px}
+.svc-panel-desc{font-size:14px;color:var(--text2);line-height:1.9;margin-bottom:48px}
+.svc-feature-list{list-style:none;border-top:1px solid var(--line2)}
+.svc-feature-list li{padding:20px 0;border-bottom:1px solid var(--line2);display:flex;align-items:baseline;gap:20px;font-size:14px;color:var(--text2);line-height:1.5}
+.svc-feature-list li::before{content:counter(items, decimal-leading-zero);counter-increment:items;font-size:10px;color:var(--text3);letter-spacing:0.1em;flex-shrink:0}
+.svc-feature-list{counter-reset:items}
+.svc-notice{margin-top:40px;padding:24px;border:1px solid rgba(139,58,42,0.3);background:rgba(139,58,42,0.06)}
+.svc-notice-title{font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:rgba(200,100,80,0.8);margin-bottom:8px}
+.svc-notice-text{font-size:12px;color:var(--text3);line-height:1.7}
+
+/* --- PLATFORM DB ENGINE SECTION --- */
+.matchmaker{padding:160px 80px;background:var(--surface);position:relative;border-top:1px solid var(--line2)}
+.match-grid{display:grid;grid-template-columns:1fr 1fr;gap:80px;max-width:1400px;margin:0 auto}
 .match-form{background:var(--bg);padding:40px;border:1px solid var(--line2);height:fit-content}
 .form-group{margin-bottom:32px}
 .form-label{display:block;font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:var(--text3);margin-bottom:12px}
 .form-input, .form-select{width:100%;padding:16px 20px;background:var(--bg2);border:1px solid var(--line2);font-family:'Syne',sans-serif;font-size:14px;color:var(--text);outline:none;}
 .intent-toggle{display:flex;gap:1px;background:var(--line2);border:1px solid var(--line2)}
-.intent-btn{flex:1;padding:16px;background:var(--bg);border:none;font-family:'Syne',sans-serif;font-size:12px;letter-spacing:0.1em;text-transform:uppercase;color:var(--text2);cursor:pointer;}
+.intent-btn{flex:1;padding:16px;background:var(--bg);border:none;font-family:'Syne',sans-serif;font-size:12px;letter-spacing:0.1em;text-transform:uppercase;color:var(--text2);cursor:none;}
 .intent-btn.active{background:var(--gold);color:var(--bg);font-weight:500}
 .slider-container{margin-top:16px}
 .hours-display{display:flex;justify-content:space-between;margin-bottom:12px;font-size:14px;color:var(--text);font-weight:500}
-input[type=range]{width:100%;}
-.btn-gold{background:var(--gold);color:var(--bg);border:none;padding:16px 40px;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;cursor:pointer;width:100%}
+input[type=range]{width:100%;cursor:none;}
 .system-msg{padding:24px;background:#e8f4ec;border:1px solid #c2e0cb;color:#2d5a3f;font-size:13px;display:none;margin-top:24px;text-align:center}
 .db-viewer{background:var(--bg);border:1px solid var(--line2);padding:32px}
 .db-title{font-family:'Playfair Display',serif;font-size:24px;margin-bottom:24px;color:var(--text);border-bottom:1px solid var(--line2);padding-bottom:12px}
@@ -42,9 +145,9 @@ input[type=range]{width:100%;}
 .db-table-title{font-size:11px;letter-spacing:0.15em;text-transform:uppercase;color:var(--text3);margin-bottom:12px}
 .db-row{display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--line2);font-size:13px;color:var(--text2)}
 .db-row.header{font-weight:500;color:var(--text);text-transform:uppercase;font-size:10px;letter-spacing:0.1em;border-bottom:2px solid var(--line)}
-/* OVERLAY MODAL */
-.overlay{position:fixed;inset:0;background:rgba(253,252,249,0.9);z-index:9999;display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:24px;color:var(--gold)}
-.operator-panel{position:fixed;inset:0;background:rgba(26,20,16,0.95);z-index:999;display:none;padding:80px;overflow-y:auto;color:var(--bg)}
+
+/* OPERATOR DASHBOARD (MODAL) */
+.operator-panel{position:fixed;inset:0;background:rgba(26,20,16,0.95);z-index:9999;display:none;padding:80px;overflow-y:auto;color:var(--bg);cursor:auto;}
 .operator-panel.active{display:block}
 .op-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:60px;border-bottom:1px solid rgba(255,255,255,0.1);padding-bottom:24px}
 .op-title{font-family:'Playfair Display',serif;font-size:36px;color:var(--gold)}
@@ -54,56 +157,313 @@ input[type=range]{width:100%;}
 .match-side .name{font-family:'Playfair Display',serif;font-size:24px;margin-bottom:4px;color:var(--bg)}
 .match-center{text-align:center;color:var(--gold);font-size:24px}
 .match-actions{grid-column:1 / -1;margin-top:16px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.1);display:flex;gap:16px;justify-content:flex-end}
-.btn-op-approve{background:var(--gold);color:var(--bg);border:none;padding:10px 24px;cursor:pointer;}
+.btn-op-approve{background:var(--gold);color:var(--bg);border:none;padding:10px 24px;cursor:pointer;font-family:'Syne',sans-serif;text-transform:uppercase;letter-spacing:0.1em;}
+
+/* PRICING */
+.pricing{padding:160px 80px;background:var(--surface);position:relative;overflow:hidden;border-top:1px solid var(--line2)}
+.pricing::before{content:'';position:absolute;top:-200px;right:-200px;width:600px;height:600px;border-radius:50%;background:radial-gradient(circle,rgba(155,122,62,0.06) 0%,transparent 70%);pointer-events:none}
+.pricing-header{text-align:center;margin-bottom:80px}
+.pricing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line2)}
+.pricing-card{background:var(--bg);padding:48px 40px;position:relative;transition:background 0.4s}
+.pricing-card:hover{background:var(--surface)}
+.pricing-card.featured{background:var(--surface)}
+.pricing-badge{position:absolute;top:24px;right:24px;font-size:9px;letter-spacing:0.2em;text-transform:uppercase;padding:5px 12px;background:var(--gold);color:var(--bg);font-weight:500}
+.pc-dot{width:10px;height:10px;border-radius:50%;margin-bottom:28px}
+.pc-dot.g{background:#4A7A5A}
+.pc-dot.y{background:var(--gold)}
+.pc-dot.r{background:#A85040}
+.pc-name{font-family:'Playfair Display',serif;font-size:28px;font-weight:300;color:var(--text);margin-bottom:6px}
+.pc-quote{font-size:12px;font-style:italic;font-family:'Playfair Display',serif;color:var(--text3);margin-bottom:28px}
+.pc-price{font-family:'Playfair Display',serif;font-size:36px;font-weight:300;color:var(--gold);line-height:1;margin-bottom:4px}
+.pc-freq{font-size:11px;color:var(--text3);letter-spacing:0.08em;margin-bottom:36px}
+.pc-list{list-style:none;margin-bottom:40px}
+.pc-list li{font-size:13px;color:var(--text2);padding:9px 0;border-bottom:1px solid var(--line2);display:flex;gap:12px;align-items:baseline}
+.pc-list li::before{content:'—';color:var(--gold-dim);font-size:10px;flex-shrink:0}
+.btn-card{width:100%;padding:14px;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;border:1px solid var(--text3);background:transparent;color:var(--text2);cursor:none;transition:all 0.3s;font-family:'Syne',sans-serif}
+.btn-card:hover,.pricing-card.featured .btn-card{border-color:var(--gold);color:var(--gold)}
+
+/* AI ADVISOR */
+.ai-section{padding:160px 80px;position:relative;overflow:hidden;border-top:1px solid var(--line2)}
+.ai-section::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:radial-gradient(ellipse 50% 60% at 50% 50%,rgba(155,122,62,0.04) 0%,transparent 70%);pointer-events:none}
+.ai-header{text-align:center;margin-bottom:80px}
+.ai-widget{max-width:860px;margin:0 auto;background:var(--surface);border:1px solid var(--line2);position:relative}
+.ai-widget-top{padding:32px 40px;border-bottom:1px solid var(--line2);display:flex;align-items:center;gap:16px}
+.ai-orb{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--gold-dim),var(--gold));display:flex;align-items:center;justify-content:center;font-size:16px;animation:orbPulse 3s ease-in-out infinite}
+.ai-widget-title{font-size:13px;letter-spacing:0.08em;color:var(--text)}
+.ai-widget-sub{font-size:11px;color:var(--text3);margin-left:auto;letter-spacing:0.06em}
+.ai-chat{padding:32px 40px;min-height:320px;max-height:440px;overflow-y:auto}
+.ai-chat::-webkit-scrollbar{width:2px}
+.ai-chat::-webkit-scrollbar-track{background:transparent}
+.ai-chat::-webkit-scrollbar-thumb{background:var(--gold-dim);border-radius:2px}
+.msg{margin-bottom:24px;display:flex;gap:16px;align-items:flex-start}
+.msg.user{flex-direction:row-reverse}
+.msg-avatar{width:32px;height:32px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;letter-spacing:0.06em;font-weight:500}
+.msg.ai .msg-avatar{background:var(--surface2);border:1px solid var(--line);color:var(--gold)}
+.msg.user .msg-avatar{background:var(--gold);color:var(--bg)}
+.msg-bubble{padding:16px 20px;max-width:520px;font-size:13px;line-height:1.75;color:var(--text2)}
+.msg.ai .msg-bubble{background:var(--surface);border:1px solid var(--line2)}
+.msg.user .msg-bubble{background:var(--surface2);border:1px solid var(--line);color:var(--text);text-align:right}
+.msg-bubble strong{color:var(--gold);font-weight:500}
+.ai-typing{display:none;align-items:center;gap:6px;padding:0 0 16px 48px}
+.ai-typing.show{display:flex}
+.typing-dot{width:5px;height:5px;border-radius:50%;background:var(--gold-dim);animation:typingAnim 1.4s ease-in-out infinite}
+.typing-dot:nth-child(2){animation-delay:0.2s}
+.typing-dot:nth-child(3){animation-delay:0.4s}
+.ai-quick{padding:0 40px 24px;display:flex;gap:8px;flex-wrap:wrap}
+.ai-quick-btn{border:1px solid var(--line);background:transparent;padding:9px 18px;font-size:11px;letter-spacing:0.06em;color:var(--text3);cursor:none;transition:all 0.3s;font-family:'Syne',sans-serif}
+.ai-quick-btn:hover{border-color:var(--gold);color:var(--gold)}
+.ai-input-row{padding:20px 40px;border-top:1px solid var(--line2);display:flex;gap:12px;align-items:center}
+.ai-input{flex:1;background:transparent;border:none;outline:none;font-size:13px;color:var(--text);font-family:'Syne',sans-serif;letter-spacing:0.03em}
+.ai-input::placeholder{color:var(--text3)}
+.ai-send{background:var(--gold);border:none;width:40px;height:40px;display:flex;align-items:center;justify-content:center;cursor:none;flex-shrink:0;transition:background 0.3s;font-size:16px;color:var(--bg)}
+.ai-send:hover{background:var(--gold2)}
+.ai-send:disabled{background:var(--surface2);opacity:0.5;cursor:not-allowed}
+.ai-error{display:none;padding:12px 40px;font-size:12px;color:rgba(200,80,60,0.8);border-top:1px solid rgba(200,80,60,0.15)}
+
+/* WHY */
+.why{padding:160px 80px;background:var(--surface)}
+.why-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line2);margin-top:80px}
+.why-item{background:var(--bg);padding:48px 32px;position:relative;overflow:hidden;transition:background 0.4s}
+.why-item:hover{background:var(--bg2)}
+.why-item::before{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:var(--gold);transform:scaleX(0);transition:transform 0.4s;transform-origin:left}
+.why-item:hover::before{transform:scaleX(1)}
+.why-num{font-family:'Playfair Display',serif;font-size:48px;font-weight:300;color:var(--line);line-height:1;margin-bottom:28px}
+.why-title{font-size:14px;font-weight:500;color:var(--text);letter-spacing:0.04em;margin-bottom:12px}
+.why-text{font-size:13px;color:var(--text3);line-height:1.8}
+
+/* NOTICE BAND */
+.notice-band{padding:48px 80px;background:var(--surface2);border-top:1px solid var(--line2);border-bottom:1px solid var(--line2);display:flex;gap:64px;align-items:center}
+.notice-item{display:flex;gap:16px;align-items:flex-start}
+.notice-icon{font-size:18px;flex-shrink:0;margin-top:2px}
+.notice-title{font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:rgba(220,100,80,0.9);margin-bottom:4px}
+.notice-text{font-size:12px;color:var(--text3);line-height:1.6}
+
+/* CTA */
+.cta{padding:180px 80px;text-align:center;position:relative;overflow:hidden}
+.cta::before{content:'ONA';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:'Playfair Display',serif;font-size:400px;font-weight:300;color:rgba(155,122,62,0.04);letter-spacing:0.2em;pointer-events:none;white-space:nowrap;line-height:1}
+.cta-eyebrow{font-size:10px;letter-spacing:0.3em;text-transform:uppercase;color:var(--gold);margin-bottom:28px}
+.cta-h2{font-family:'Playfair Display',serif;font-size:clamp(42px,5vw,72px);font-weight:300;color:var(--text);line-height:1.1;margin-bottom:20px}
+.cta-h2 em{font-style:italic;color:var(--gold)}
+.cta-sub{font-size:14px;color:var(--text2);margin-bottom:56px;line-height:1.8;font-family:'Playfair Display',serif;font-style:italic}
+.cta-btns{display:flex;gap:16px;justify-content:center}
+
+/* FOOTER */
+footer{padding:60px 80px 40px;border-top:1px solid var(--line2);display:flex;justify-content:space-between;align-items:flex-end}
+.footer-left{}
+.footer-logo{font-family:'Playfair Display',serif;font-size:32px;font-weight:300;color:var(--gold);letter-spacing:0.25em;margin-bottom:8px}
+.footer-tagline{font-size:12px;font-style:italic;font-family:'Playfair Display',serif;color:var(--text3)}
+.footer-right{display:flex;gap:32px;align-items:center}
+.footer-link{font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--text3);text-decoration:none;transition:color 0.3s}
+.footer-link:hover{color:var(--gold)}
+.footer-copy{font-size:11px;color:var(--text3)}
+
+/* SCROLL REVEAL */
+.reveal{opacity:0;transform:translateY(40px);transition:opacity 0.9s ease,transform 0.9s ease}
+.reveal.visible{opacity:1;transform:translateY(0)}
+
+/* ANIMATIONS */
+@keyframes fadeUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes scrollAnim{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
+@keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@keyframes orbPulse{0%,100%{box-shadow:0 0 0 0 rgba(200,169,110,0.3)}50%{box-shadow:0 0 0 12px rgba(200,169,110,0)}}
+@keyframes typingAnim{0%,60%,100%{opacity:0.3;transform:translateY(0)}30%{opacity:1;transform:translateY(-4px)}}
 </style>
 </head>
 <body>
 
-<!-- Betöltő képernyő, amíg az SQLite motor elindul -->
-<div class="overlay" id="loader">Adatbázis motor (SQLite) indítása...</div>
+<div id="cursor"></div>
+<div id="cursor-ring"></div>
 
-<!-- NAV -->
 <nav>
   <div class="nav-logo">ONA</div>
-  <div>
-    <button class="nav-btn operator" onclick="toggleOperatorPanel()">Üzemeltetői Nézet (Alerts)</button>
+  <div class="nav-right">
+    <a href="#services" class="nav-link">Szolgáltatások</a>
+    <a href="#platform" class="nav-link">Platform (DB)</a>
+    <a href="#pricing" class="nav-link">Árazás</a>
+    <a href="#advisor" class="nav-link">AI Tanácsadó</a>
+    <button class="nav-btn op-btn" onclick="toggleOperatorPanel()">Üzemeltetői Nézet</button>
   </div>
 </nav>
 
-<!-- PLATFORM ENGINE -->
-<section class="matchmaker">
-  <div class="match-header">
-    <div class="section-num">SQL Engine fut</div>
-    <h2 class="section-title">Regisztráció & <em>Párosítás</em></h2>
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-lines"></div>
+  <div class="hero-left">
+    <div class="hero-eyebrow">Otthoni gondoskodás újragondolva</div>
+    <h1 class="hero-h1">Care that<br>feels <em>human.</em></h1>
+    <p class="hero-tagline">Emberi jelenlét,<br>prémium minőségben.</p>
+    <div class="hero-ctas">
+      <button class="btn-gold" onclick="document.getElementById('platform').scrollIntoView({behavior:'smooth'})">Csatlakozás a platformhoz</button>
+      <button class="btn-outline" onclick="document.getElementById('services').scrollIntoView({behavior:'smooth'})">Szolgáltatások</button>
+    </div>
+    <div class="hero-scroll">
+      <div class="scroll-line"></div>
+      <span class="scroll-text">Görgessen</span>
+    </div>
+  </div>
+  <div class="hero-right">
+    <div class="hero-services">
+      <div class="hero-svc"><div class="svc-num">01</div><div class="svc-title">ONA Senior</div><div class="svc-sub">Mindennapi támogatás időseknek</div></div>
+      <div class="hero-svc"><div class="svc-num">02</div><div class="svc-title">ONA Recovery</div><div class="svc-sub">Támogatás műtét vagy betegség után</div></div>
+      <div class="hero-svc"><div class="svc-num">03</div><div class="svc-title">ONA Mama</div><div class="svc-sub">Gondoskodás az első hetekben</div></div>
+      <div class="hero-svc"><div class="svc-num">04</div><div class="svc-title">ONA Care</div><div class="svc-sub">Szakképzett otthoni ellátás</div></div>
+    </div>
+  </div>
+</section>
+
+<div class="marquee-wrap">
+  <div class="marquee-inner">
+    <span class="marquee-item"><span class="marquee-dot"></span>ONA Senior</span>
+    <span class="marquee-item"><span class="marquee-dot"></span>ONA Recovery</span>
+    <span class="marquee-item"><span class="marquee-dot"></span>ONA Mama</span>
+    <span class="marquee-item"><span class="marquee-dot"></span>ONA Care</span>
+    <span class="marquee-item"><span class="marquee-dot"></span>Care that feels human</span>
+    <span class="marquee-item"><span class="marquee-dot"></span>Budapest · Austria · Europe</span>
+    <span class="marquee-item"><span class="marquee-dot"></span>ONA Senior</span>
+    <span class="marquee-item"><span class="marquee-dot"></span>ONA Recovery</span>
+    <span class="marquee-item"><span class="marquee-dot"></span>ONA Mama</span>
+    <span class="marquee-item"><span class="marquee-dot"></span>ONA Care</span>
+    <span class="marquee-item"><span class="marquee-dot"></span>Care that feels human</span>
+    <span class="marquee-item"><span class="marquee-dot"></span>Budapest · Austria · Europe</span>
+  </div>
+</div>
+
+<section class="manifesto">
+  <div class="manifesto-deco">ONA</div>
+  <div class="manifesto-grid reveal">
+    <div>
+      <div class="manifesto-label">A misszió</div>
+      <p class="manifesto-side-text">Nem intézményi ellátás. Nem egészségügyi beavatkozás. Valódi, meleg emberi jelenlét — akiknek az idő és a nyugalom értékesebb, mint az ár.</p>
+    </div>
+    <div class="manifesto-main">
+      <div class="manifesto-quote">Az emberek <em>nem ellátást</em> keresnek — <em>biztonságot</em> és <em>jelenlétet</em> keresnek.</div>
+      <div class="manifesto-stats">
+        <div class="stat-box"><div class="stat-n">4</div><div class="stat-l">Prémium szolgáltatás</div></div>
+        <div class="stat-box"><div class="stat-n">59k</div><div class="stat-l">Ft/hó-tól</div></div>
+        <div class="stat-box"><div class="stat-n">∞</div><div class="stat-l">Skálázható</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="services" id="services">
+  <div class="services-header reveal">
+    <div>
+      <div class="section-num">02 / Szolgáltatások</div>
+      <h2 class="section-title">Minden helyzethez<br><em>a megfelelő</em><br>támogatás</h2>
+    </div>
+    <p class="section-desc">Az ONA négy gondosan megtervezett szolgáltatással áll rendelkezésre — időseknek, felépülőknek, friss anyukáknak és azoknak, akik prémium szakmai segítséget igényelnek otthon.</p>
+  </div>
+  <div class="svc-tabs">
+    <button class="svc-tab active" onclick="showSvc('senior',this)">ONA Senior</button>
+    <button class="svc-tab" onclick="showSvc('recovery',this)">ONA Recovery</button>
+    <button class="svc-tab" onclick="showSvc('mama',this)">ONA Mama</button>
+    <button class="svc-tab" onclick="showSvc('care',this)">ONA Care</button>
+  </div>
+  <div class="svc-panels">
+    <div class="svc-panel active" id="svc-senior">
+      <div class="svc-panel-left">
+        <div class="svc-icon-big">👴</div>
+        <div class="svc-panel-name">ONA<br>Senior</div>
+        <div class="svc-panel-tag">Mindennapi támogatás időseknek</div>
+        <p class="svc-panel-desc">Önálló, de segítséget igénylő időseknek és azoknak a családoknak, akik biztonságot és emberi kapcsolatot szeretnének biztosítani szeretteiknek — akár külföldről is.</p>
+      </div>
+      <div class="svc-panel-right">
+        <ul class="svc-feature-list">
+          <li>Bevásárlás és gyógyszer kiváltás</li>
+          <li>Társaság és séta</li>
+          <li>Orvoshoz kísérés</li>
+          <li>Könnyű házimunka és ételkészítés</li>
+          <li>Adminisztratív segítség</li>
+          <li>Rendszeres check-in a família számára</li>
+        </ul>
+        <div class="svc-notice">
+          <div class="svc-notice-title">Fontos</div>
+          <div class="svc-notice-text">Nem egészségügyi ápolás — nem végzünk orvosi beavatkozást, gyógyszer beadást vagy sebkezelést. Otthoni jelenlét és mindennapi segítség.</div>
+        </div>
+      </div>
+    </div>
+    <div class="svc-panel" id="svc-recovery">
+      <div class="svc-panel-left">
+        <div class="svc-icon-big">🩹</div>
+        <div class="svc-panel-name">ONA<br>Recovery</div>
+        <div class="svc-panel-tag">Támogatás műtét vagy betegség után</div>
+        <p class="svc-panel-desc">Műtét utáni lábadozás, sérülés utáni rehabilitáció — időseknek és fiatalabbaknak egyaránt. A felépülés legyen nyugodt és biztonságos otthon.</p>
+      </div>
+      <div class="svc-panel-right">
+        <ul class="svc-feature-list">
+          <li>Főzés és takarítás</li>
+          <li>Segítség mozgásban és közlekedésben</li>
+          <li>Bevásárlás és gyógyszer kiváltás</li>
+          <li>Mindennapi kísérés és jelenlét</li>
+          <li>Séta és fizikai aktivitás támogatás</li>
+        </ul>
+      </div>
+    </div>
+    <div class="svc-panel" id="svc-mama">
+      <div class="svc-panel-left">
+        <div class="svc-icon-big">👩</div>
+        <div class="svc-panel-name">ONA<br>Mama</div>
+        <div class="svc-panel-tag">Támogatás az első hetekben</div>
+        <p class="svc-panel-desc">Szülés utáni, túlterhelt anyukáknak, akiknek kevés a családi segítség. Hogy az anyuka pihenni tudjon — és ne maradjon egyedül.</p>
+      </div>
+      <div class="svc-panel-right">
+        <ul class="svc-feature-list">
+          <li>Főzés, takarítás, mosás</li>
+          <li>Bevásárlás és rendrakás</li>
+          <li>Segítség a baba körül</li>
+          <li>Érzelmi támogatás és jelenlét</li>
+          <li>Ügyintézés és logisztika</li>
+        </ul>
+      </div>
+    </div>
+    <div class="svc-panel" id="svc-care">
+      <div class="svc-panel-left">
+        <div class="svc-icon-big">🏠</div>
+        <div class="svc-panel-name">ONA<br>Care</div>
+        <div class="svc-panel-tag">Szakképzett otthoni támogatás</div>
+        <p class="svc-panel-desc">Csak ellenőrzött, képzett szakemberek — gyógytorna, rehabilitáció, masszázs. Prémium pozicionálás, magasabb jogi megfelelés.</p>
+        <div style="margin-top:auto;padding:20px 24px;border:1px solid rgba(200,169,110,0.2);background:rgba(200,169,110,0.04)"><div style="font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:var(--gold);margin-bottom:6px">Hamarosan</div><div style="font-size:12px;color:var(--text3);line-height:1.6">Az ONA Care 2025 második felétől lesz elérhető.</div></div>
+      </div>
+      <div class="svc-panel-right">
+        <ul class="svc-feature-list">
+          <li>Gyógytorna otthon</li>
+          <li>Rehabilitációs támogatás</li>
+          <li>Masszázs</li>
+          <li>Otthoni ápolás</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="matchmaker reveal" id="platform">
+  <div class="services-header" style="border-bottom:none; padding-bottom:40px">
+    <div>
+      <div class="section-num">03 / Platform Kereső</div>
+      <h2 class="section-title">Regisztráció & <em>Párosítás</em></h2>
+    </div>
+    <p class="section-desc">Valós idejű, böngészőben futó SQLite motorunk összeköti a megbízható gondoskodókat azokkal a családokkal, akiknek segítségre van szükségük.</p>
   </div>
 
   <div class="match-grid">
-    <!-- BAL OLDAL: BEVITELI ŰRLAP -->
     <div class="match-form">
       <div class="form-group">
         <label class="form-label">Regisztráció típusa</label>
         <div class="intent-toggle">
-          <button class="intent-btn active" id="btn-hire" onclick="setIntent('client')">Kereső (Ügyfél)</button>
-          <button class="intent-btn" id="btn-work" onclick="setIntent('worker')">Munkavállaló</button>
+          <button class="intent-btn active" id="btn-hire" onclick="setPlatformIntent(1)">Szolgáltatást kereső (1)</button>
+          <button class="intent-btn" id="btn-work" onclick="setPlatformIntent(0)">Munkakereső (0)</button>
         </div>
       </div>
 
       <div class="form-group">
-        <label class="form-label">Teljes Név</label>
-        <input type="text" class="form-input" id="userName" placeholder="Pl. Kovács Anna">
+        <label class="form-label">Név</label>
+        <input type="text" class="form-input" id="userName" placeholder="Pl. kovács anna (automatikusan formázva)">
       </div>
 
       <div class="form-group">
-        <label class="form-label">Szolgáltatás kategória</label>
-        <select class="form-select" id="jobType">
-          <option value="senior">ONA Senior</option>
-          <option value="mama">ONA Mama</option>
-          <option value="recovery">ONA Recovery</option>
-        </select>
-      </div>
-
-      <div class="form-group">
-        <label class="form-label">Időtartam (Heti óraszám)</label>
+        <label class="form-label" id="hoursLabel">Szolgáltatás hossza (óra/hét)</label>
         <div class="slider-container">
           <div class="hours-display">
             <span>2 óra</span>
@@ -114,109 +474,295 @@ input[type=range]{width:100%;}
         </div>
       </div>
 
-      <button class="btn-gold" onclick="submitToDatabase()">Adatbázisba Küldés (INSERT)</button>
+      <div class="form-group">
+        <label class="form-label" id="wageLabel">Tervezett bér / keret (Ft)</label>
+        <input type="number" class="form-input" id="wageInput" placeholder="Pl. 60000" min="0" step="1000">
+      </div>
+
+      <button class="btn-gold" style="width:100%" onclick="submitToDatabase()">Adatbázisba Küldés (INSERT)</button>
       
-      <div class="system-msg" id="successMsg">Sikeres INSERT a táblába!</div>
+      <div class="system-msg" id="successMsg">Sikeres rögzítés az adatbázisban!</div>
     </div>
 
-    <!-- JOBB OLDAL: SQL TÁBLÁK -->
     <div class="db-viewer">
-      <h3 class="db-title">Élő SQLite Táblák</h3>
+      <h3 class="db-title">Élő SQLite Tábla: 'registry'</h3>
       
       <div class="db-table-wrap">
-        <div class="db-table-title">SELECT * FROM clients;</div>
-        <div id="clientsTable"></div>
+        <div class="db-table-title">Szolgáltatást keresők (role = 1)</div>
+        <div id="clientsTable">Indítás folyamatban...</div>
       </div>
 
       <div class="db-table-wrap">
-        <div class="db-table-title">SELECT * FROM workers;</div>
-        <div id="workersTable"></div>
+        <div class="db-table-title">Munkakeresők (role = 0)</div>
+        <div id="workersTable">Indítás folyamatban...</div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- OPERATOR DASHBOARD -->
+<section class="pricing reveal" id="pricing">
+  <div class="pricing-header">
+    <div class="section-num" style="text-align:center;margin-bottom:16px">04 / Árazás</div>
+    <h2 class="section-title" style="text-align:center;font-size:clamp(38px,4.5vw,60px)">Válassza ki a <em>megfelelő szintet</em></h2>
+  </div>
+  <div class="pricing-grid">
+    <div class="pricing-card">
+      <div class="pc-dot g"></div>
+      <div class="pc-name">Essential</div>
+      <div class="pc-quote">"Egy kis segítség a hétköznapokban"</div>
+      <div class="pc-price">59 000 – 79 000</div>
+      <div class="pc-freq">Ft / hónap · heti 1× · havi 4 látogatás</div>
+      <ul class="pc-list">
+        <li>Alkalmanként 2–3 óra</li>
+        <li>Bevásárlás, gyógyszer kiváltás</li>
+        <li>Társaság, könnyű segítség</li>
+        <li>Rugalmas időpontok</li>
+      </ul>
+    </div>
+    <div class="pricing-card featured">
+      <div class="pricing-badge">Legjobb választás</div>
+      <div class="pc-dot y"></div>
+      <div class="pc-name">Comfort</div>
+      <div class="pc-quote">"Rendszeres, megbízható jelenlét"</div>
+      <div class="pc-price">129 000 – 189 000</div>
+      <div class="pc-freq">Ft / hónap · heti 2–3× · havi 8–12 látogatás</div>
+      <ul class="pc-list">
+        <li>Minden alapszolgáltatás</li>
+        <li>Dedikált caregiver</li>
+        <li>Rendszeres check-in</li>
+        <li>Prioritásos beosztás</li>
+      </ul>
+    </div>
+    <div class="pricing-card">
+      <div class="pc-dot r"></div>
+      <div class="pc-name">Daily Support</div>
+      <div class="pc-quote">"Mindennapi jelenlét"</div>
+      <div class="pc-price">290 000 – 490 000</div>
+      <div class="pc-freq">Ft / hónap · napi segítség</div>
+      <ul class="pc-list">
+        <li>Napi dedikált caregiver</li>
+        <li>Teljes körű ellátás</li>
+        <li>Havi értékelő riport</li>
+        <li>Sürgősségi elérhetőség</li>
+      </ul>
+    </div>
+  </div>
+  <p style="text-align:center;margin-top:32px;font-size:12px;color:var(--text3);letter-spacing:0.06em;font-style:italic;font-family:'Playfair Display',serif">ONA Recovery és ONA Mama csomagok: egyedi árajánlat alapján — kérje AI tanácsadónkat.</p>
+</section>
+
+<section class="ai-section" id="advisor">
+  <div class="ai-header reveal">
+    <div class="section-num" style="text-align:center;margin-bottom:16px">05 / AI Tanácsadó</div>
+    <h2 class="section-title" style="text-align:center;font-size:clamp(38px,4.5vw,60px)">Melyik csomag<br><em>illik önhöz?</em></h2>
+    <p style="text-align:center;color:var(--text2);margin-top:20px;font-size:14px;font-family:'Playfair Display',serif;font-style:italic">Írjon nekünk — az ONA AI tanácsadója személyre szabott ajánlatot készít.</p>
+  </div>
+  <div class="ai-widget reveal">
+    <div class="ai-widget-top">
+      <div class="ai-orb">✦</div>
+      <span class="ai-widget-title">ONA Tanácsadó</span>
+      <span class="ai-widget-sub">Mesterséges intelligencia</span>
+    </div>
+    <div class="ai-chat" id="aiChat">
+      <div class="msg ai">
+        <div class="msg-avatar">ONA</div>
+        <div class="msg-bubble">Üdvözlöm! Az <strong>ONA</strong> személyes tanácsadója vagyok. Segítek megtalálni az önhöz leginkább illő gondoskodó csomagot.<br><br>Mondja el: kinek szól a gondoskodás, és mire van leginkább szüksége?</div>
+      </div>
+    </div>
+    <div class="ai-typing" id="aiTyping">
+      <div class="typing-dot"></div>
+      <div class="typing-dot"></div>
+      <div class="typing-dot"></div>
+    </div>
+    <div class="ai-quick" id="aiQuick">
+      <button class="ai-quick-btn" onclick="sendQuick('Idős szülőmnek keresek segítséget')">Idős szülőmnek</button>
+      <button class="ai-quick-btn" onclick="sendQuick('Műtét után lábadozok')">Műtét után</button>
+      <button class="ai-quick-btn" onclick="sendQuick('Friss anyuka vagyok, segítségre van szükségem')">Friss anyuka</button>
+    </div>
+    <div class="ai-input-row">
+      <input class="ai-input" id="aiInput" placeholder="Írja ide kérdését..." onkeydown="if(event.key==='Enter')sendMsg()">
+      <button class="ai-send" id="aiSendBtn" onclick="sendMsg()">→</button>
+    </div>
+  </div>
+</section>
+
+<section class="why reveal">
+  <div>
+    <div class="section-num">06 / Miért ONA</div>
+    <h2 class="section-title" style="margin-top:16px">Modern, emberi,<br><em>skálázható</em></h2>
+  </div>
+  <div class="why-grid">
+    <div class="why-item"><div class="why-num">01</div><div class="why-title">Nem egészségügyi ellátás</div><div class="why-text">Pontosan körülhatárolt tevékenység — otthoni jelenlét és mindennapi segítség, jogi biztonságban.</div></div>
+    <div class="why-item"><div class="why-num">02</div><div class="why-title">Prémium célpiac</div><div class="why-text">Középosztály+, elfoglalt családok, külföldön élő gyerekek — akiknek az idő és a nyugalom fontosabb, mint az ár.</div></div>
+    <div class="why-item"><div class="why-num">03</div><div class="why-title">Appban is működik</div><div class="why-text">"Letöltöm az ONA appot" — "Az ONA küld valakit." Skálázható platformlogika, európai terjeszkedésre kész.</div></div>
+    <div class="why-item"><div class="why-num">04</div><div class="why-title">Nemzetközi brand</div><div class="why-text">ONA Austria, ONA Recovery, ONA Care — a brand nem "ragad" magyarul. Globálisan hordozható.</div></div>
+  </div>
+</section>
+
+<div class="notice-band">
+  <div class="notice-item"><div class="notice-icon">⚠️</div><div class="notice-body"><div class="notice-title">Nem egészségügyi szolgáltatás</div><div class="notice-text">Orvosi ellátást, ápolói beavatkozást nem végzünk.</div></div></div>
+  <div class="notice-item"><div class="notice-icon">⚠️</div><div class="notice-body"><div class="notice-title">Nem gyógyszer beadás</div><div class="notice-text">Gyógyszert felírni, beadni vagy felügyelni nem állhat módunkban.</div></div></div>
+  <div class="notice-item" style="margin-left:auto"><div class="notice-icon" style="color:var(--gold)">✓</div><div class="notice-body"><div class="notice-title" style="color:rgba(100,180,120,0.9)">Cél: nyugodt otthoni lét</div><div class="notice-text">Emberi jelenlét, háztartási és logisztikai támogatás.</div></div></div>
+</div>
+
+<section class="cta reveal">
+  <div class="cta-eyebrow">Kezdjük el</div>
+  <h2 class="cta-h2">Kinek szól<br>az <em>ONA</em>?</h2>
+  <p class="cta-sub">Kérdezze meg AI tanácsadónkat — 24 óra alatt személyre szabott ajánlatot küldünk.</p>
+  <div class="cta-btns">
+    <button class="btn-gold" onclick="document.getElementById('advisor').scrollIntoView({behavior:'smooth'})">AI Tanácsadó →</button>
+    <a href="mailto:hello@ona.hu" class="btn-outline" style="text-decoration:none;display:inline-flex;align-items:center;justify-content:center">hello@ona.hu</a>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-left">
+    <div class="footer-logo">ONA</div>
+    <div class="footer-tagline">"Care that feels human."</div>
+  </div>
+  <div class="footer-right">
+    <a href="#services" class="footer-link">Services</a>
+    <a href="#platform" class="footer-link">Platform</a>
+    <a href="#pricing" class="footer-link">Pricing</a>
+    <a href="#advisor" class="footer-link">AI Advisor</a>
+    <span class="footer-copy">© 2026 ONA · ona.hu</span>
+  </div>
+</footer>
+
 <div class="operator-panel" id="operatorPanel">
   <div class="op-header">
-    <div class="op-title">Üzemeltetői Dashboard</div>
+    <div class="op-title">Üzemeltetői Dashboard (SQL Alerts)</div>
     <button class="op-close" onclick="toggleOperatorPanel()">Bezárás</button>
   </div>
-  
   <p style="margin-bottom:40px;color:var(--text3);letter-spacing:0.05em">
-    FUTTATOTT SQL: <br><br>
-    <code style="color:var(--gold)">
-      SELECT c.id as cid, c.name as cname, w.id as wid, w.name as wname, c.type<br>
-      FROM clients c<br>
-      INNER JOIN workers w ON c.type = w.type<br>
-      WHERE w.hours >= c.hours;
-    </code>
+    FUTTATOTT SQL JOIN: Olyan munkavállalók keresése, akiknek a kapacitása lefedi a kliens igényét, és a fizetési igényük kisebb vagy egyenlő a kerettel.
   </p>
-
   <div id="alertsContainer"></div>
 </div>
 
 <script>
-let db; // Globális SQLite adatbázis változó
-let currentIntent = 'client'; 
-let idCounter = 300;
-
-// INICIALIZÁLÁS: SQLite WebAssembly betöltése
-async function initDB() {
-  const SQL = await initSqlJs({
-    locateFile: file => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/${file}`
-  });
-  
-  // Új adatbázis létrehozása a memóriában
-  db = new SQL.Database();
-  
-  // SQL DDL: Táblák létrehozása
-  db.run(`
-    CREATE TABLE clients (id TEXT, name TEXT, type TEXT, hours INTEGER);
-    CREATE TABLE workers (id TEXT, name TEXT, type TEXT, hours INTEGER);
-    CREATE TABLE matches (match_id TEXT, client_id TEXT, worker_id TEXT);
-  `);
-
-  // Teszt adatok beszúrása
-  db.run("INSERT INTO clients VALUES ('C101', 'Szabó Család', 'senior', 15)");
-  db.run("INSERT INTO workers VALUES ('W201', 'Kovács Margit', 'senior', 20)");
-
-  // Loader eltüntetése, táblák kirajzolása
-  document.getElementById('loader').style.display = 'none';
-  renderTables();
-  checkMatches();
+// --- NÉV FORMÁZÓ ALGORITMUS ---
+function formatName(name) {
+  if (!name) return "";
+  return name.toLowerCase().split(' ').map(word => {
+    if (word === 'dr' || word === 'dr.') return word;
+    return word.charAt(0).toUpperCase() + word.slice(1);
+  }).join(' ');
 }
 
-// Oldal betöltésekor indítjuk az SQLite-ot
-window.onload = initDB;
+// --- UI / EFFEKTEK LOGIKA ---
+const cursor=document.getElementById('cursor'),ring=document.getElementById('cursor-ring');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cursor.style.left=mx+'px';cursor.style.top=my+'px'});
+function animRing(){rx+=(mx-rx)*0.12;ry+=(my-ry)*0.12;ring.style.left=rx+'px';ring.style.top=ry+'px';requestAnimationFrame(animRing)}
+animRing();
+document.querySelectorAll('button,a,.hero-svc,.svc-tab,.why-item,input,select').forEach(el=>{
+  el.addEventListener('mouseenter',()=>{cursor.style.transform='translate(-50%,-50%) scale(2)';ring.style.transform='translate(-50%,-50%) scale(1.5)';ring.style.opacity='0.6'});
+  el.addEventListener('mouseleave',()=>{cursor.style.transform='translate(-50%,-50%) scale(1)';ring.style.transform='translate(-50%,-50%) scale(1)';ring.style.opacity='1'});
+});
 
-function setIntent(intent) {
-  currentIntent = intent;
-  document.getElementById('btn-hire').classList.toggle('active', intent === 'client');
-  document.getElementById('btn-work').classList.toggle('active', intent === 'worker');
+const observer=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible')})},{threshold:0.1});
+document.querySelectorAll('.reveal').forEach(el=>observer.observe(el));
+
+function showSvc(id,btn){
+  document.querySelectorAll('.svc-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.svc-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('svc-'+id).classList.add('active');
+  btn.classList.add('active');
+}
+
+// --- AI ADVISOR LOGIKA ---
+async function callAPI(userMsg){
+  return new Promise(resolve => setTimeout(() => resolve("Az ONA mesterséges intelligenciája jelenleg bemutató módban van. Javaslom a platform kereső funkcióját fentebb!"), 1000));
+}
+function addMsg(role,text){
+  const chat=document.getElementById('aiChat');
+  const div=document.createElement('div');
+  div.className='msg '+role;
+  const avatar=document.createElement('div');
+  avatar.className='msg-avatar';
+  avatar.textContent=role==='ai'?'ONA':'Ön';
+  const bubble=document.createElement('div');
+  bubble.className='msg-bubble';
+  bubble.innerHTML=text.replace(/\n/g,'<br>');
+  div.appendChild(avatar);
+  div.appendChild(bubble);
+  chat.appendChild(div);
+  chat.scrollTop=chat.scrollHeight;
+}
+async function sendMsg(){
+  const input=document.getElementById('aiInput');
+  const msg=input.value.trim();
+  if(!msg)return;
+  addMsg('user',msg);
+  input.value='';
+  document.getElementById('aiTyping').classList.add('show');
+  const reply=await callAPI(msg);
+  document.getElementById('aiTyping').classList.remove('show');
+  addMsg('ai',reply);
+}
+function sendQuick(msg){document.getElementById('aiQuick').style.display='none'; document.getElementById('aiInput').value=msg; sendMsg();}
+
+// --- SQLITE ADATBÁZIS LOGIKA (EGYSÉGES TÁBLA) ---
+let db; 
+let currentDbIntent = 1; // 1: Szolgáltatást kereső, 0: Munkakereső
+
+document.addEventListener('DOMContentLoaded', async () => {
+  try {
+    const SQL = await initSqlJs({ locateFile: file => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/${file}` });
+    db = new SQL.Database();
+    
+    // Egységes tábla létrehozása
+    db.run(`
+      CREATE TABLE registry (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT,
+        role INTEGER, -- 1: Kereső, 0: Munkavállaló
+        hours INTEGER,
+        wage INTEGER
+      );
+    `);
+
+    // Példa adatok
+    db.run("INSERT INTO registry (name, role, hours, wage) VALUES ('Kovács Anna', 1, 15, 60000)");
+    db.run("INSERT INTO registry (name, role, hours, wage) VALUES ('dr. Szabó Péter', 0, 20, 50000)");
+
+    renderTables();
+    checkMatches();
+  } catch (err) {
+    console.error("Hiba az SQLite betöltésekor", err);
+    document.getElementById('clientsTable').innerText = "Hiba az adatbázis indulásakor.";
+  }
+});
+
+function setPlatformIntent(intentValue) {
+  currentDbIntent = intentValue;
+  document.getElementById('btn-hire').classList.toggle('active', intentValue === 1);
+  document.getElementById('btn-work').classList.toggle('active', intentValue === 0);
+  
+  document.getElementById('hoursLabel').innerText = intentValue === 1 ? "Szolgáltatás hossza (óra/hét)" : "Munkakereső kapacitása (óra/hét)";
+  document.getElementById('wageLabel').innerText = intentValue === 1 ? "Tervezett bér / keret (Ft)" : "Fizetési igény (Ft)";
 }
 
 function updateSlider() {
   document.getElementById('hoursValue').innerText = document.getElementById('hoursSlider').value + ' óra';
 }
 
-// ADATBÁZISBA ÍRÁS (INSERT INTO)
 function submitToDatabase() {
-  const nameInput = document.getElementById('userName').value.trim();
-  const typeInput = document.getElementById('jobType').value;
+  const rawName = document.getElementById('userName').value.trim();
   const hoursInput = parseInt(document.getElementById('hoursSlider').value);
+  const wageInput = parseInt(document.getElementById('wageInput').value);
 
-  if(!nameInput) return alert("Név kötelező!");
+  if(!rawName) { alert("Név megadása kötelező!"); return; }
+  if(!wageInput || wageInput < 0) { alert("Kérem adjon meg egy érvényes összeget!"); return; }
 
-  idCounter++;
-  const newId = (currentIntent === 'client' ? 'C' : 'W') + idCounter;
-  const tableName = currentIntent === 'client' ? 'clients' : 'workers';
+  const formattedName = formatName(rawName);
 
-  // Valódi SQL INSERT parancs futtatása
-  db.run(`INSERT INTO ${tableName} (id, name, type, hours) VALUES (?, ?, ?, ?)`, [newId, nameInput, typeInput, hoursInput]);
+  db.run(`INSERT INTO registry (name, role, hours, wage) VALUES (?, ?, ?, ?)`, 
+         [formattedName, currentDbIntent, hoursInput, wageInput]);
 
-  // UI frissítés
   document.getElementById('userName').value = '';
+  document.getElementById('wageInput').value = '';
+  
   const msg = document.getElementById('successMsg');
   msg.style.display = 'block';
   setTimeout(() => { msg.style.display = 'none'; }, 3000);
@@ -225,79 +771,65 @@ function submitToDatabase() {
   checkMatches();
 }
 
-// TÁBLÁK LEKÉRDEZÉSE (SELECT)
 function renderTables() {
-  const typeMap = { 'senior': 'ONA Senior', 'mama': 'ONA Mama', 'recovery': 'ONA Recovery' };
-
-  // Clients lekérdezése
-  const clientRes = db.exec("SELECT * FROM clients");
-  let cHtml = `<div class="db-row header"><span style="flex:1">ID</span><span style="flex:2">Név</span><span style="flex:2">Típus</span><span style="flex:1;text-align:right">Óra</span></div>`;
+  const clientRes = db.exec("SELECT name, hours, wage FROM registry WHERE role = 1");
+  let cHtml = `<div class="db-row header"><span style="flex:2">Név</span><span style="flex:1;text-align:center">Óra</span><span style="flex:1;text-align:right">Bér/Keret</span></div>`;
   if(clientRes.length > 0) {
     clientRes[0].values.forEach(row => {
-      cHtml += `<div class="db-row"><span style="flex:1;color:var(--text3)">${row[0]}</span><span style="flex:2;font-weight:500">${row[1]}</span><span style="flex:2">${typeMap[row[2]]}</span><span style="flex:1;text-align:right">${row[3]}h</span></div>`;
+      cHtml += `<div class="db-row"><span style="flex:2;font-weight:500">${row[0]}</span><span style="flex:1;text-align:center">${row[1]}h</span><span style="flex:1;text-align:right">${row[2]} Ft</span></div>`;
     });
   }
   document.getElementById('clientsTable').innerHTML = cHtml;
 
-  // Workers lekérdezése
-  const workerRes = db.exec("SELECT * FROM workers");
-  let wHtml = `<div class="db-row header"><span style="flex:1">ID</span><span style="flex:2">Név</span><span style="flex:2">Típus</span><span style="flex:1;text-align:right">Óra</span></div>`;
+  const workerRes = db.exec("SELECT name, hours, wage FROM registry WHERE role = 0");
+  let wHtml = `<div class="db-row header"><span style="flex:2">Név</span><span style="flex:1;text-align:center">Óra</span><span style="flex:1;text-align:right">Igény</span></div>`;
   if(workerRes.length > 0) {
     workerRes[0].values.forEach(row => {
-      wHtml += `<div class="db-row"><span style="flex:1;color:var(--text3)">${row[0]}</span><span style="flex:2;font-weight:500">${row[1]}</span><span style="flex:2">${typeMap[row[2]]}</span><span style="flex:1;text-align:right">${row[3]}h</span></div>`;
+      wHtml += `<div class="db-row"><span style="flex:2;font-weight:500">${row[0]}</span><span style="flex:1;text-align:center">${row[1]}h</span><span style="flex:1;text-align:right">${row[2]} Ft</span></div>`;
     });
   }
   document.getElementById('workersTable').innerHTML = wHtml;
 }
 
-// PÁROSÍTÁS (SQL INNER JOIN)
 function checkMatches() {
-  // Olyan munkavállalókat és ügyfeleket keresünk, ahol a típus egyezik, és a munkavállaló VAGY több órát vállal, mint amit az ügyfél kér
   const matchQuery = `
-    SELECT c.id as cid, c.name as cname, c.hours as chours,
-           w.id as wid, w.name as wname, w.hours as whours, c.type
-    FROM clients c
-    INNER JOIN workers w ON c.type = w.type
-    WHERE w.hours >= c.hours
+    SELECT c.name as client_name, c.hours as client_hours, c.wage as client_wage,
+           w.name as worker_name, w.hours as worker_hours, w.wage as worker_wage
+    FROM registry c 
+    INNER JOIN registry w ON c.role = 1 AND w.role = 0
+    WHERE w.hours >= c.hours AND w.wage <= c.wage
   `;
   
   const matches = db.exec(matchQuery);
   const container = document.getElementById('alertsContainer');
-  const typeMap = { 'senior': 'ONA Senior', 'mama': 'ONA Mama', 'recovery': 'ONA Recovery' };
-  const opBtn = document.querySelector('.nav-btn.operator');
+  const opBtn = document.querySelector('.nav-btn.op-btn');
   
   if (matches.length === 0) {
-    container.innerHTML = `<div style="color:var(--text2);font-style:italic">Jelenleg nincs SQL egyezés.</div>`;
+    container.innerHTML = `<div style="color:var(--text2);font-style:italic">Jelenleg nincs az igényeknek megfelelő SQL egyezés.</div>`;
     opBtn.style = '';
-    opBtn.innerText = 'Üzemeltetői Nézet (Alerts)';
+    opBtn.innerText = 'Üzemeltetői Nézet';
     return;
   }
 
-  // Értesítés a gombban
   opBtn.style.backgroundColor = '#8B3A2A';
   opBtn.style.color = '#fff';
   opBtn.style.borderColor = '#8B3A2A';
-  opBtn.innerText = `Új Találat (${matches[0].values.length} db)`;
+  opBtn.innerText = `Új Találat (${matches[0].values.length})`;
 
-  // Találatok renderelése
   let html = '';
   matches[0].values.forEach((row, index) => {
-    // row szerkezete: [cid, cname, chours, wid, wname, whours, type]
     html += `
       <div class="match-alert-card" id="match-${index}">
         <div class="match-side">
-          <h4>Ügyfél</h4>
-          <div class="name">${row[1]}</div>
-          <div style="font-size:13px;color:#ccc">Igény: ${row[2]} óra</div>
+          <h4>Szolgáltatást kereső</h4>
+          <div class="name">${row[0]}</div>
+          <div style="font-size:13px;color:#ccc">Igény: ${row[1]} óra | Keret: ${row[2]} Ft</div>
         </div>
-        <div class="match-center">
-          <div>⟷</div>
-          <div style="font-size:12px;color:#ccc;margin-top:4px;">${typeMap[row[6]]}</div>
-        </div>
+        <div class="match-center"><div>⟷</div></div>
         <div class="match-side" style="text-align:right">
-          <h4>Munkavállaló</h4>
-          <div class="name">${row[4]}</div>
-          <div style="font-size:13px;color:#ccc">Kapacitás: ${row[5]} óra</div>
+          <h4>Munkakereső</h4>
+          <div class="name">${row[3]}</div>
+          <div style="font-size:13px;color:#ccc">Kapacitás: ${row[4]} óra | Igény: ${row[5]} Ft</div>
         </div>
         <div class="match-actions">
           <button class="btn-op-approve" onclick="document.getElementById('match-${index}').style.display='none'">Párosítás Jóváhagyása</button>
@@ -310,9 +842,9 @@ function checkMatches() {
 
 function toggleOperatorPanel() {
   document.getElementById('operatorPanel').classList.toggle('active');
-  const opBtn = document.querySelector('.nav-btn.operator');
+  const opBtn = document.querySelector('.nav-btn.op-btn');
   opBtn.style = '';
-  opBtn.innerText = 'Üzemeltetői Nézet (Alerts)';
+  opBtn.innerText = 'Üzemeltetői Nézet';
 }
 </script>
 </body>

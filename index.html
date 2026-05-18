@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ONA — SQLite Matchmaker Engine</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,300;0,400;1,300;1,400&family=Syne:wght@300;400;500;700&display=swap" rel="stylesheet">
+<!-- SQL.js betöltése SQLite-hoz -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/sql-wasm.js"></script>
+<style>
+/* ... (A CSS dizájn pontosan ugyanaz marad, mint az előző verzióban) ... */
+*{margin:0;padding:0;box-sizing:border-box}
+:root{ --bg:#FDFCF9; --bg2:#F8F5EF; --surface:#F2EDE4; --surface2:#EDE7DC; --gold:#9B7A3E; --gold2:#B8943A; --gold-dim:#C4A86A; --text:#1A1410; --text2:#6B5E4E; --text3:#A8998A; --line:rgba(155,122,62,0.18); --line2:rgba(155,122,62,0.1); }
+body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;font-weight:300;overflow-x:hidden}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:28px 60px;display:flex;justify-content:space-between;align-items:center;background:rgba(253,252,249,0.95);border-bottom:1px solid var(--line2)}
+.nav-logo{font-family:'Playfair Display',serif;font-size:22px;font-weight:300;letter-spacing:0.3em;color:var(--gold);text-transform:uppercase}
+.nav-btn{border:1px solid var(--gold-dim);padding:10px 28px;font-size:11px;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold);background:transparent;cursor:pointer;transition:all 0.3s;font-family:'Syne',sans-serif}
+.nav-btn.operator{border-color:var(--text);color:var(--text)}
+.nav-btn.operator:hover{background:var(--text);color:var(--bg)}
+.matchmaker{padding:140px 80px 80px;background:var(--surface);min-height:100vh}
+.match-header{text-align:center;margin-bottom:60px}
+.section-num{font-size:10px;letter-spacing:0.3em;color:var(--text3);margin-bottom:16px;text-transform:uppercase}
+.section-title{font-family:'Playfair Display',serif;font-size:clamp(38px,4vw,56px);font-weight:300;color:var(--text);line-height:1.05}
+.section-title em{font-style:italic;color:var(--gold)}
+.match-grid{display:grid;grid-template-columns:400px 1fr;gap:60px;max-width:1200px;margin:0 auto}
+.match-form{background:var(--bg);padding:40px;border:1px solid var(--line2);height:fit-content}
+.form-group{margin-bottom:32px}
+.form-label{display:block;font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:var(--text3);margin-bottom:12px}
+.form-input, .form-select{width:100%;padding:16px 20px;background:var(--bg2);border:1px solid var(--line2);font-family:'Syne',sans-serif;font-size:14px;color:var(--text);outline:none;}
+.intent-toggle{display:flex;gap:1px;background:var(--line2);border:1px solid var(--line2)}
+.intent-btn{flex:1;padding:16px;background:var(--bg);border:none;font-family:'Syne',sans-serif;font-size:12px;letter-spacing:0.1em;text-transform:uppercase;color:var(--text2);cursor:pointer;}
+.intent-btn.active{background:var(--gold);color:var(--bg);font-weight:500}
+.slider-container{margin-top:16px}
+.hours-display{display:flex;justify-content:space-between;margin-bottom:12px;font-size:14px;color:var(--text);font-weight:500}
+input[type=range]{width:100%;}
+.btn-gold{background:var(--gold);color:var(--bg);border:none;padding:16px 40px;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;cursor:pointer;width:100%}
+.system-msg{padding:24px;background:#e8f4ec;border:1px solid #c2e0cb;color:#2d5a3f;font-size:13px;display:none;margin-top:24px;text-align:center}
+.db-viewer{background:var(--bg);border:1px solid var(--line2);padding:32px}
+.db-title{font-family:'Playfair Display',serif;font-size:24px;margin-bottom:24px;color:var(--text);border-bottom:1px solid var(--line2);padding-bottom:12px}
+.db-table-wrap{margin-bottom:32px}
+.db-table-title{font-size:11px;letter-spacing:0.15em;text-transform:uppercase;color:var(--text3);margin-bottom:12px}
+.db-row{display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--line2);font-size:13px;color:var(--text2)}
+.db-row.header{font-weight:500;color:var(--text);text-transform:uppercase;font-size:10px;letter-spacing:0.1em;border-bottom:2px solid var(--line)}
+/* OVERLAY MODAL */
+.overlay{position:fixed;inset:0;background:rgba(253,252,249,0.9);z-index:9999;display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:24px;color:var(--gold)}
+.operator-panel{position:fixed;inset:0;background:rgba(26,20,16,0.95);z-index:999;display:none;padding:80px;overflow-y:auto;color:var(--bg)}
+.operator-panel.active{display:block}
+.op-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:60px;border-bottom:1px solid rgba(255,255,255,0.1);padding-bottom:24px}
+.op-title{font-family:'Playfair Display',serif;font-size:36px;color:var(--gold)}
+.op-close{background:transparent;border:1px solid var(--bg);color:var(--bg);padding:8px 24px;cursor:pointer;font-family:'Syne',sans-serif;}
+.match-alert-card{background:rgba(255,255,255,0.05);border:1px solid var(--gold-dim);padding:32px;margin-bottom:24px;display:grid;grid-template-columns:1fr auto 1fr;gap:32px;align-items:center;border-left:4px solid var(--gold)}
+.match-side h4{font-size:10px;text-transform:uppercase;letter-spacing:0.2em;color:var(--text3);margin-bottom:8px}
+.match-side .name{font-family:'Playfair Display',serif;font-size:24px;margin-bottom:4px;color:var(--bg)}
+.match-center{text-align:center;color:var(--gold);font-size:24px}
+.match-actions{grid-column:1 / -1;margin-top:16px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.1);display:flex;gap:16px;justify-content:flex-end}
+.btn-op-approve{background:var(--gold);color:var(--bg);border:none;padding:10px 24px;cursor:pointer;}
+</style>
+</head>
+<body>
+
+<!-- Betöltő képernyő, amíg az SQLite motor elindul -->
+<div class="overlay" id="loader">Adatbázis motor (SQLite) indítása...</div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">ONA</div>
+  <div>
+    <button class="nav-btn operator" onclick="toggleOperatorPanel()">Üzemeltetői Nézet (Alerts)</button>
+  </div>
+</nav>
+
+<!-- PLATFORM ENGINE -->
+<section class="matchmaker">
+  <div class="match-header">
+    <div class="section-num">SQL Engine fut</div>
+    <h2 class="section-title">Regisztráció & <em>Párosítás</em></h2>
+  </div>
+
+  <div class="match-grid">
+    <!-- BAL OLDAL: BEVITELI ŰRLAP -->
+    <div class="match-form">
+      <div class="form-group">
+        <label class="form-label">Regisztráció típusa</label>
+        <div class="intent-toggle">
+          <button class="intent-btn active" id="btn-hire" onclick="setIntent('client')">Kereső (Ügyfél)</button>
+          <button class="intent-btn" id="btn-work" onclick="setIntent('worker')">Munkavállaló</button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Teljes Név</label>
+        <input type="text" class="form-input" id="userName" placeholder="Pl. Kovács Anna">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Szolgáltatás kategória</label>
+        <select class="form-select" id="jobType">
+          <option value="senior">ONA Senior</option>
+          <option value="mama">ONA Mama</option>
+          <option value="recovery">ONA Recovery</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Időtartam (Heti óraszám)</label>
+        <div class="slider-container">
+          <div class="hours-display">
+            <span>2 óra</span>
+            <span id="hoursValue" style="color:var(--gold)">10 óra</span>
+            <span>40 óra</span>
+          </div>
+          <input type="range" id="hoursSlider" min="2" max="40" value="10" step="1" oninput="updateSlider()">
+        </div>
+      </div>
+
+      <button class="btn-gold" onclick="submitToDatabase()">Adatbázisba Küldés (INSERT)</button>
+      
+      <div class="system-msg" id="successMsg">Sikeres INSERT a táblába!</div>
+    </div>
+
+    <!-- JOBB OLDAL: SQL TÁBLÁK -->
+    <div class="db-viewer">
+      <h3 class="db-title">Élő SQLite Táblák</h3>
+      
+      <div class="db-table-wrap">
+        <div class="db-table-title">SELECT * FROM clients;</div>
+        <div id="clientsTable"></div>
+      </div>
+
+      <div class="db-table-wrap">
+        <div class="db-table-title">SELECT * FROM workers;</div>
+        <div id="workersTable"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- OPERATOR DASHBOARD -->
+<div class="operator-panel" id="operatorPanel">
+  <div class="op-header">
+    <div class="op-title">Üzemeltetői Dashboard</div>
+    <button class="op-close" onclick="toggleOperatorPanel()">Bezárás</button>
+  </div>
+  
+  <p style="margin-bottom:40px;color:var(--text3);letter-spacing:0.05em">
+    FUTTATOTT SQL: <br><br>
+    <code style="color:var(--gold)">
+      SELECT c.id as cid, c.name as cname, w.id as wid, w.name as wname, c.type<br>
+      FROM clients c<br>
+      INNER JOIN workers w ON c.type = w.type<br>
+      WHERE w.hours >= c.hours;
+    </code>
+  </p>
+
+  <div id="alertsContainer"></div>
+</div>
+
+<script>
+let db; // Globális SQLite adatbázis változó
+let currentIntent = 'client'; 
+let idCounter = 300;
+
+// INICIALIZÁLÁS: SQLite WebAssembly betöltése
+async function initDB() {
+  const SQL = await initSqlJs({
+    locateFile: file => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/${file}`
+  });
+  
+  // Új adatbázis létrehozása a memóriában
+  db = new SQL.Database();
+  
+  // SQL DDL: Táblák létrehozása
+  db.run(`
+    CREATE TABLE clients (id TEXT, name TEXT, type TEXT, hours INTEGER);
+    CREATE TABLE workers (id TEXT, name TEXT, type TEXT, hours INTEGER);
+    CREATE TABLE matches (match_id TEXT, client_id TEXT, worker_id TEXT);
+  `);
+
+  // Teszt adatok beszúrása
+  db.run("INSERT INTO clients VALUES ('C101', 'Szabó Család', 'senior', 15)");
+  db.run("INSERT INTO workers VALUES ('W201', 'Kovács Margit', 'senior', 20)");
+
+  // Loader eltüntetése, táblák kirajzolása
+  document.getElementById('loader').style.display = 'none';
+  renderTables();
+  checkMatches();
+}
+
+// Oldal betöltésekor indítjuk az SQLite-ot
+window.onload = initDB;
+
+function setIntent(intent) {
+  currentIntent = intent;
+  document.getElementById('btn-hire').classList.toggle('active', intent === 'client');
+  document.getElementById('btn-work').classList.toggle('active', intent === 'worker');
+}
+
+function updateSlider() {
+  document.getElementById('hoursValue').innerText = document.getElementById('hoursSlider').value + ' óra';
+}
+
+// ADATBÁZISBA ÍRÁS (INSERT INTO)
+function submitToDatabase() {
+  const nameInput = document.getElementById('userName').value.trim();
+  const typeInput = document.getElementById('jobType').value;
+  const hoursInput = parseInt(document.getElementById('hoursSlider').value);
+
+  if(!nameInput) return alert("Név kötelező!");
+
+  idCounter++;
+  const newId = (currentIntent === 'client' ? 'C' : 'W') + idCounter;
+  const tableName = currentIntent === 'client' ? 'clients' : 'workers';
+
+  // Valódi SQL INSERT parancs futtatása
+  db.run(`INSERT INTO ${tableName} (id, name, type, hours) VALUES (?, ?, ?, ?)`, [newId, nameInput, typeInput, hoursInput]);
+
+  // UI frissítés
+  document.getElementById('userName').value = '';
+  const msg = document.getElementById('successMsg');
+  msg.style.display = 'block';
+  setTimeout(() => { msg.style.display = 'none'; }, 3000);
+
+  renderTables();
+  checkMatches();
+}
+
+// TÁBLÁK LEKÉRDEZÉSE (SELECT)
+function renderTables() {
+  const typeMap = { 'senior': 'ONA Senior', 'mama': 'ONA Mama', 'recovery': 'ONA Recovery' };
+
+  // Clients lekérdezése
+  const clientRes = db.exec("SELECT * FROM clients");
+  let cHtml = `<div class="db-row header"><span style="flex:1">ID</span><span style="flex:2">Név</span><span style="flex:2">Típus</span><span style="flex:1;text-align:right">Óra</span></div>`;
+  if(clientRes.length > 0) {
+    clientRes[0].values.forEach(row => {
+      cHtml += `<div class="db-row"><span style="flex:1;color:var(--text3)">${row[0]}</span><span style="flex:2;font-weight:500">${row[1]}</span><span style="flex:2">${typeMap[row[2]]}</span><span style="flex:1;text-align:right">${row[3]}h</span></div>`;
+    });
+  }
+  document.getElementById('clientsTable').innerHTML = cHtml;
+
+  // Workers lekérdezése
+  const workerRes = db.exec("SELECT * FROM workers");
+  let wHtml = `<div class="db-row header"><span style="flex:1">ID</span><span style="flex:2">Név</span><span style="flex:2">Típus</span><span style="flex:1;text-align:right">Óra</span></div>`;
+  if(workerRes.length > 0) {
+    workerRes[0].values.forEach(row => {
+      wHtml += `<div class="db-row"><span style="flex:1;color:var(--text3)">${row[0]}</span><span style="flex:2;font-weight:500">${row[1]}</span><span style="flex:2">${typeMap[row[2]]}</span><span style="flex:1;text-align:right">${row[3]}h</span></div>`;
+    });
+  }
+  document.getElementById('workersTable').innerHTML = wHtml;
+}
+
+// PÁROSÍTÁS (SQL INNER JOIN)
+function checkMatches() {
+  // Olyan munkavállalókat és ügyfeleket keresünk, ahol a típus egyezik, és a munkavállaló VAGY több órát vállal, mint amit az ügyfél kér
+  const matchQuery = `
+    SELECT c.id as cid, c.name as cname, c.hours as chours,
+           w.id as wid, w.name as wname, w.hours as whours, c.type
+    FROM clients c
+    INNER JOIN workers w ON c.type = w.type
+    WHERE w.hours >= c.hours
+  `;
+  
+  const matches = db.exec(matchQuery);
+  const container = document.getElementById('alertsContainer');
+  const typeMap = { 'senior': 'ONA Senior', 'mama': 'ONA Mama', 'recovery': 'ONA Recovery' };
+  const opBtn = document.querySelector('.nav-btn.operator');
+  
+  if (matches.length === 0) {
+    container.innerHTML = `<div style="color:var(--text2);font-style:italic">Jelenleg nincs SQL egyezés.</div>`;
+    opBtn.style = '';
+    opBtn.innerText = 'Üzemeltetői Nézet (Alerts)';
+    return;
+  }
+
+  // Értesítés a gombban
+  opBtn.style.backgroundColor = '#8B3A2A';
+  opBtn.style.color = '#fff';
+  opBtn.style.borderColor = '#8B3A2A';
+  opBtn.innerText = `Új Találat (${matches[0].values.length} db)`;
+
+  // Találatok renderelése
+  let html = '';
+  matches[0].values.forEach((row, index) => {
+    // row szerkezete: [cid, cname, chours, wid, wname, whours, type]
+    html += `
+      <div class="match-alert-card" id="match-${index}">
+        <div class="match-side">
+          <h4>Ügyfél</h4>
+          <div class="name">${row[1]}</div>
+          <div style="font-size:13px;color:#ccc">Igény: ${row[2]} óra</div>
+        </div>
+        <div class="match-center">
+          <div>⟷</div>
+          <div style="font-size:12px;color:#ccc;margin-top:4px;">${typeMap[row[6]]}</div>
+        </div>
+        <div class="match-side" style="text-align:right">
+          <h4>Munkavállaló</h4>
+          <div class="name">${row[4]}</div>
+          <div style="font-size:13px;color:#ccc">Kapacitás: ${row[5]} óra</div>
+        </div>
+        <div class="match-actions">
+          <button class="btn-op-approve" onclick="document.getElementById('match-${index}').style.display='none'">Párosítás Jóváhagyása</button>
+        </div>
+      </div>
+    `;
+  });
+  container.innerHTML = html;
+}
+
+function toggleOperatorPanel() {
+  document.getElementById('operatorPanel').classList.toggle('active');
+  const opBtn = document.querySelector('.nav-btn.operator');
+  opBtn.style = '';
+  opBtn.innerText = 'Üzemeltetői Nézet (Alerts)';
+}
+</script>
+</body>
+</html>

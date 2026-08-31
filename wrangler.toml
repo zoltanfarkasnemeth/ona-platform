@@ -1,0 +1,10 @@
+name = "ona-backend"
+main = "src/worker.js"
+compatibility_date = "2024-09-23"
+
+# A "database_id" értékét a `wrangler d1 create ona-db` parancs adja vissza —
+# másold be ide, mielőtt telepítenéd (lásd README "Backend — Cloudflare Workers + D1").
+[[d1_databases]]
+binding = "DB"
+database_name = "ona-db"
+database_id = "IDE_MASOLD_A_WRANGLER_D1_CREATE_KIMENETET"

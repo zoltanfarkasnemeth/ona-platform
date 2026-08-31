@@ -1,0 +1,5 @@
+0000000000000000000000000000000000000000 ee21c9261ee7a94f3b5b885544edfd6eef29e403 ONA <ona@example.com> 1787907069 +0000	commit (initial): ONA honlap — kezdő verzió (5 oldal: kezdőlap, szolgáltatások, árazás, hogyan működik, jelentkezés)
+ee21c9261ee7a94f3b5b885544edfd6eef29e403 ee21c9261ee7a94f3b5b885544edfd6eef29e403 ONA <ona@example.com> 1787907073 +0000	Branch: renamed refs/heads/master to refs/heads/main
+ee21c9261ee7a94f3b5b885544edfd6eef29e403 69c2a71466d3f96138c90da5071893186a6c3f75 ONA <ona@example.com> 1787986555 +0000	commit: Adatbázis (keresők/munkavállalók) és Excel párosító motor hozzáadása (20%-os fizetési sáv)
+69c2a71466d3f96138c90da5071893186a6c3f75 d95c7c3b264480a4d3286a7aecc04bb61eb46007 ONA <ona@example.com> 1788160436 +0000	commit: Település/irányítószám-kereső, csúszka+szám dupla beviteli mező, és opcionális Flask backend a valódi DB-mentéshez
+d95c7c3b264480a4d3286a7aecc04bb61eb46007 5f5581712cf3ad5aee34d0aaa7b92ee7a16a21c9 ONA <ona@example.com> 1788161646 +0000	commit: Rendes csúszka+stepper vezérlő az óraszám mezőknél; Cloudflare Workers + D1 backend hozzáadása (leteszteltem helyi Miniflare-rel)

@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Árazás — ONA</title>
+<meta name="description" content="ONA csomagok és árazás: Essential, Comfort és Daily Support otthoni gondoskodási szolgáltatások.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%23132447'/%3E%3Ctext x='32' y='43' font-family='Arial,sans-serif' font-size='30' font-weight='700' fill='%23C68A3E' text-anchor='middle'%3EO%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+:root{
+  --bg:#F7F8FB;
+  --bg-alt:#EEF1F7;
+  --card:#FFFFFF;
+  --navy:#132447;
+  --navy-2:#1F3A66;
+  --navy-soft:#EAF0FA;
+  --text:#1B2430;
+  --text-soft:#5B6472;
+  --text-mute:#8D96A5;
+  --border:#E6E9F1;
+  --gold:#C68A3E;
+  --gold-dark:#A96F2E;
+  --gold-soft:#FBF0DD;
+  --green:#2F8F5B;
+  --green-soft:#E8F6EE;
+  --red:#B4462F;
+  --red-soft:#FBEAE5;
+  --shadow-sm:0 2px 10px rgba(19,36,71,0.05);
+  --shadow:0 10px 30px rgba(19,36,71,0.08);
+  --shadow-lg:0 24px 60px rgba(19,36,71,0.12);
+  --radius-lg:20px;
+  --radius:14px;
+  --radius-sm:10px;
+  --maxw:1180px;
+}
+body{background:var(--bg);color:var(--text);font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;font-weight:400;line-height:1.5;-webkit-font-smoothing:antialiased}
+img{max-width:100%;display:block}
+a{color:inherit;text-decoration:none}
+ul{list-style:none}
+button{font-family:inherit}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 32px}
+section{padding:100px 0}
+@media(max-width:900px){section{padding:64px 0}.wrap{padding:0 20px}}
+
+/* TYPE */
+h1,h2,h3,h4{font-family:'Inter',sans-serif;color:var(--navy);letter-spacing:-0.01em}
+.eyebrow{display:inline-flex;align-items:center;gap:10px;font-size:12px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold-dark);margin-bottom:18px}
+.eyebrow::before{content:'';width:8px;height:8px;border-radius:50%;background:var(--gold)}
+.h1{font-size:clamp(34px,4.6vw,56px);font-weight:800;line-height:1.08;color:var(--navy)}
+.h2{font-size:clamp(28px,3.6vw,42px);font-weight:800;line-height:1.15;color:var(--navy)}
+.h3{font-size:22px;font-weight:700;color:var(--navy)}
+.lead{font-size:17px;color:var(--text-soft);line-height:1.7}
+.section-head{max-width:680px;margin:0 auto 56px;text-align:center}
+.section-head.left{margin:0 0 48px;text-align:left}
+.accent{color:var(--gold)}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:15px 30px;border-radius:100px;font-size:14px;font-weight:700;letter-spacing:0.01em;cursor:pointer;border:1px solid transparent;transition:all .2s ease;white-space:nowrap}
+.btn-primary{background:var(--gold);color:#fff;box-shadow:0 8px 20px rgba(198,138,62,0.30)}
+.btn-primary:hover{background:var(--gold-dark);transform:translateY(-1px)}
+.btn-navy{background:var(--navy);color:#fff;box-shadow:0 8px 20px rgba(19,36,71,0.22)}
+.btn-navy:hover{background:var(--navy-2);transform:translateY(-1px)}
+.btn-outline{background:#fff;color:var(--navy);border:1px solid var(--border)}
+.btn-outline:hover{border-color:var(--navy);}
+.btn-sm{padding:11px 22px;font-size:13px}
+.btn-block{width:100%}
+
+/* NAV */
+.nav{position:sticky;top:0;z-index:200;background:rgba(247,248,251,0.88);backdrop-filter:blur(10px);border-bottom:1px solid var(--border)}
+.nav-inner{max-width:var(--maxw);margin:0 auto;padding:18px 32px;display:flex;align-items:center;justify-content:space-between;gap:24px}
+.logo{font-size:22px;font-weight:800;letter-spacing:0.02em;color:var(--navy)}
+.logo span{color:var(--gold)}
+.nav-links{display:flex;gap:36px;align-items:center}
+.nav-link{font-size:14px;font-weight:600;color:var(--text-soft);transition:color .2s}
+.nav-link:hover{color:var(--navy)}
+.nav-link.active{color:var(--gold-dark)}
+.nav-cta{display:flex;align-items:center;gap:16px}
+.nav-toggle{display:none;background:none;border:none;font-size:22px;color:var(--navy);cursor:pointer}
+@media(max-width:860px){
+  .nav-links{position:fixed;top:66px;left:0;right:0;background:#fff;flex-direction:column;align-items:flex-start;padding:24px 24px 32px;gap:18px;border-bottom:1px solid var(--border);box-shadow:var(--shadow);display:none}
+  .nav-links.open{display:flex}
+  .nav-toggle{display:block}
+}
+
+/* HERO */
+.hero{padding:64px 0 40px;overflow:hidden}
+.hero-grid{display:grid;grid-template-columns:1.05fr 0.95fr;gap:64px;align-items:center}
+@media(max-width:960px){.hero-grid{grid-template-columns:1fr}}
+.hero-badges{display:flex;gap:10px;flex-wrap:wrap;margin-top:28px}
+.chip{display:inline-flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--border);padding:9px 16px;border-radius:100px;font-size:12.5px;font-weight:600;color:var(--text-soft);box-shadow:var(--shadow-sm)}
+.hero-ctas{display:flex;gap:14px;margin-top:36px;flex-wrap:wrap}
+.hero-visual{position:relative}
+.hero-card{background:var(--card);border-radius:var(--radius-lg);box-shadow:var(--shadow-lg);border:1px solid var(--border);padding:28px;position:relative;z-index:2}
+.hero-card-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+.hero-card-title{font-size:13px;font-weight:700;color:var(--text-mute);text-transform:uppercase;letter-spacing:0.08em}
+.mini-avatar-row{display:flex;align-items:center;gap:10px}
+.avatar{width:34px;height:34px;border-radius:50%;background:var(--navy-soft);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:var(--navy-2)}
+.progress-row{margin:18px 0}
+.progress-label{display:flex;justify-content:space-between;font-size:13px;color:var(--text-soft);margin-bottom:8px;font-weight:600}
+.progress-bar{height:8px;background:var(--bg-alt);border-radius:100px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--gold-dark));border-radius:100px}
+.hero-schedule{margin-top:20px;display:flex;flex-direction:column;gap:10px}
+.sched-item{display:flex;align-items:center;gap:14px;padding:12px 14px;background:var(--bg);border-radius:var(--radius-sm);border:1px solid var(--border)}
+.sched-time{font-size:13px;font-weight:700;color:var(--navy);width:48px;flex-shrink:0}
+.sched-name{font-size:13.5px;font-weight:600;color:var(--text)}
+.sched-sub{font-size:12px;color:var(--text-mute)}
+.sched-tag{margin-left:auto;font-size:11px;font-weight:700;padding:4px 10px;border-radius:100px}
+.tag-progress{background:var(--gold-soft);color:var(--gold-dark)}
+.tag-next{background:var(--navy-soft);color:var(--navy-2)}
+.floaty{position:absolute;background:#fff;border-radius:var(--radius);box-shadow:var(--shadow-lg);border:1px solid var(--border);padding:16px 18px;z-index:3}
+.floaty-1{top:-24px;right:-18px;display:flex;align-items:center;gap:12px}
+.floaty-2{bottom:-28px;left:-24px;display:flex;align-items:center;gap:12px}
+.floaty-icon{width:38px;height:38px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.floaty-icon.green{background:var(--green-soft)}
+.floaty-icon.gold{background:var(--gold-soft)}
+.floaty-title{font-size:12.5px;font-weight:700;color:var(--navy)}
+.floaty-sub{font-size:11.5px;color:var(--text-mute)}
+@media(max-width:960px){.floaty{display:none}}
+
+/* STAT STRIP */
+.stat-strip{background:var(--navy);border-radius:var(--radius-lg);padding:40px;display:grid;grid-template-columns:repeat(4,1fr);gap:24px;color:#fff;margin-top:80px}
+@media(max-width:760px){.stat-strip{grid-template-columns:repeat(2,1fr)}}
+.stat-n{font-size:32px;font-weight:800;color:#fff}
+.stat-n span{color:var(--gold)}
+.stat-l{font-size:12.5px;color:rgba(255,255,255,0.65);margin-top:6px;font-weight:600}
+
+/* CARDS / GRID */
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:24px}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+@media(max-width:960px){.grid-4{grid-template-columns:repeat(2,1fr)}.grid-3{grid-template-columns:1fr 1fr}}
+@media(max-width:640px){.grid-4{grid-template-columns:1fr}.grid-3{grid-template-columns:1fr}.grid-2{grid-template-columns:1fr}}
+
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:32px;transition:box-shadow .25s, transform .25s}
+.card:hover{box-shadow:var(--shadow);transform:translateY(-3px)}
+.icon-box{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:24px;margin-bottom:20px;background:var(--gold-soft)}
+.icon-box.navy{background:var(--navy-soft)}
+.icon-box.green{background:var(--green-soft)}
+.svc-card h3{margin-bottom:8px}
+.svc-card p{color:var(--text-soft);font-size:14.5px;line-height:1.7;margin-bottom:18px}
+.svc-card .btn{padding:9px 0;font-size:13px}
+.pill-link{font-size:13.5px;font-weight:700;color:var(--gold-dark);display:inline-flex;align-items:center;gap:6px}
+
+.badge{display:inline-block;font-size:11px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;padding:5px 12px;border-radius:100px}
+.badge-gold{background:var(--gold-soft);color:var(--gold-dark)}
+.badge-green{background:var(--green-soft);color:var(--green)}
+.badge-navy{background:var(--navy-soft);color:var(--navy-2)}
+.badge-red{background:var(--red-soft);color:var(--red)}
+
+/* WHY GRID */
+.why-item{padding:8px 0}
+.why-num{font-size:13px;font-weight:800;color:var(--gold);margin-bottom:14px}
+.why-title{font-size:16px;font-weight:700;color:var(--navy);margin-bottom:10px}
+.why-text{font-size:14px;color:var(--text-soft);line-height:1.7}
+
+/* NOTICE */
+.notice{display:flex;gap:16px;padding:22px 24px;border-radius:var(--radius);border:1px solid var(--border);background:var(--card)}
+.notice.warn{border-color:#F0D8CE;background:var(--red-soft)}
+.notice.ok{border-color:#CFE9DA;background:var(--green-soft)}
+.notice-icon{font-size:20px;flex-shrink:0}
+.notice-title{font-size:13.5px;font-weight:700;color:var(--navy);margin-bottom:4px}
+.notice-text{font-size:13.5px;color:var(--text-soft);line-height:1.65}
+
+/* TABS */
+.tabbar{display:flex;gap:8px;flex-wrap:wrap;border-bottom:1px solid var(--border);margin-bottom:48px}
+.tabbtn{padding:14px 22px;font-size:14px;font-weight:700;color:var(--text-mute);background:none;border:none;border-bottom:2px solid transparent;margin-bottom:-1px;cursor:pointer;transition:all .2s}
+.tabbtn.active{color:var(--gold-dark);border-bottom-color:var(--gold)}
+.tabpanel{display:none;grid-template-columns:0.85fr 1.15fr;gap:56px;align-items:start}
+.tabpanel.active{display:grid}
+@media(max-width:860px){.tabpanel{grid-template-columns:1fr}}
+.tab-icon{width:64px;height:64px;border-radius:18px;background:var(--gold-soft);display:flex;align-items:center;justify-content:center;font-size:30px;margin-bottom:28px}
+.tab-name{font-size:34px;font-weight:800;color:var(--navy);line-height:1.1;margin-bottom:10px}
+.tab-tag{font-size:13px;font-weight:700;color:var(--gold-dark);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:22px}
+.tab-desc{color:var(--text-soft);font-size:15px;line-height:1.75;margin-bottom:28px}
+.feat-list{border-top:1px solid var(--border)}
+.feat-list li{display:flex;gap:16px;align-items:flex-start;padding:16px 0;border-bottom:1px solid var(--border);font-size:14.5px;color:var(--text)}
+.feat-check{width:22px;height:22px;border-radius:50%;background:var(--green-soft);color:var(--green);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;margin-top:1px}
+
+/* PRICING */
+.price-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:36px 32px;position:relative;display:flex;flex-direction:column}
+.price-card.featured{border-color:var(--gold);box-shadow:var(--shadow-lg);transform:translateY(-8px)}
+@media(max-width:960px){.price-card.featured{transform:none}}
+.price-badge{position:absolute;top:-14px;left:32px;background:var(--gold);color:#fff;font-size:11px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;padding:6px 16px;border-radius:100px}
+.price-dot{width:12px;height:12px;border-radius:50%;margin-bottom:20px}
+.price-name{font-size:22px;font-weight:800;color:var(--navy);margin-bottom:6px}
+.price-quote{font-size:13px;color:var(--text-mute);font-style:italic;margin-bottom:24px}
+.price-num{font-size:30px;font-weight:800;color:var(--navy)}
+.price-freq{font-size:12.5px;color:var(--text-mute);margin:6px 0 28px}
+.price-list{margin-bottom:28px;flex-grow:1}
+.price-list li{display:flex;gap:10px;padding:9px 0;font-size:14px;color:var(--text-soft);border-bottom:1px solid var(--border)}
+.price-list li::before{content:'✓';color:var(--green);font-weight:800;flex-shrink:0}
+
+/* STEPS */
+.steps{counter-reset:step}
+.step{display:flex;gap:22px;padding:28px 0;border-bottom:1px solid var(--border)}
+.step:last-child{border-bottom:none}
+.step-num{counter-increment:step;width:44px;height:44px;border-radius:14px;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:16px;flex-shrink:0}
+.step-num::before{content:counter(step, decimal-leading-zero)}
+.step-body h4{font-size:16.5px;font-weight:700;color:var(--navy);margin-bottom:6px}
+.step-body p{font-size:14px;color:var(--text-soft);line-height:1.7}
+.track-head{display:flex;align-items:center;gap:14px;margin-bottom:8px}
+.track-icon{width:46px;height:46px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px}
+
+/* FAQ */
+.faq-item{border-bottom:1px solid var(--border)}
+.faq-q{width:100%;text-align:left;background:none;border:none;padding:22px 4px;font-size:15.5px;font-weight:700;color:var(--navy);display:flex;justify-content:space-between;align-items:center;cursor:pointer}
+.faq-icon{font-size:18px;color:var(--gold);transition:transform .25s;flex-shrink:0;margin-left:16px}
+.faq-item.open .faq-icon{transform:rotate(45deg)}
+.faq-a{max-height:0;overflow:hidden;transition:max-height .3s ease}
+.faq-a p{padding:0 4px 22px;font-size:14.5px;color:var(--text-soft);line-height:1.75;max-width:760px}
+
+/* FORM */
+.form-shell{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:40px;box-shadow:var(--shadow)}
+.role-toggle{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border);border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;margin-bottom:36px}
+.role-btn{padding:18px 12px;background:#fff;border:none;font-family:inherit;font-size:14px;font-weight:700;color:var(--text-soft);cursor:pointer;transition:all .2s}
+.role-btn.active{background:var(--navy);color:#fff}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.form-row-3{display:grid;grid-template-columns:1.3fr 0.7fr 1.3fr;gap:20px}
+@media(max-width:600px){.form-row,.form-row-3{grid-template-columns:1fr}}
+.ac-wrap{position:relative}
+.ac-list{position:absolute;top:100%;left:0;right:0;margin-top:6px;background:#fff;border:1px solid var(--border);border-radius:var(--radius-sm);box-shadow:var(--shadow-lg);max-height:230px;overflow-y:auto;z-index:80;display:none;list-style:none}
+.ac-list.open{display:block}
+.ac-item{padding:11px 16px;font-size:13.5px;color:var(--text);cursor:pointer;border-bottom:1px solid var(--border)}
+.ac-item:last-child{border-bottom:none}
+.ac-item b{color:var(--gold-dark)}
+.ac-item:hover,.ac-item.active{background:var(--bg-alt)}
+.ac-empty{padding:11px 16px;font-size:13px;color:var(--text-mute);font-style:italic}
+.num-slider{display:flex;align-items:center;gap:14px}
+.num-slider input[type=range]{flex:1}
+.num-slider-box{width:64px;flex-shrink:0;padding:10px 8px;text-align:center;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);font-family:inherit;font-size:14px;font-weight:700;color:var(--navy)}
+.field{margin-bottom:22px}
+.field label{display:block;font-size:12.5px;font-weight:700;color:var(--text-soft);margin-bottom:9px;text-transform:uppercase;letter-spacing:0.05em}
+.field input,.field select,.field textarea{width:100%;padding:14px 16px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);font-family:inherit;font-size:14.5px;color:var(--text);outline:none;transition:border-color .2s}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--gold)}
+.field textarea{resize:vertical;min-height:100px}
+.field-hint{font-size:12px;color:var(--text-mute);margin-top:7px}
+.check-row{display:flex;align-items:flex-start;gap:10px;font-size:13px;color:var(--text-soft);margin-bottom:28px}
+.check-row input{margin-top:3px}
+.slider-wrap{margin-top:6px}
+.slider-vals{display:flex;justify-content:space-between;font-size:12.5px;color:var(--text-mute);margin-top:8px}
+input[type=range]{width:100%;accent-color:var(--gold)}
+.success-panel{display:none;text-align:center;padding:60px 30px}
+.success-icon{width:72px;height:72px;border-radius:50%;background:var(--green-soft);color:var(--green);font-size:34px;display:flex;align-items:center;justify-content:center;margin:0 auto 24px}
+.side-info{display:flex;flex-direction:column;gap:24px}
+.info-note{background:var(--navy);color:#fff;border-radius:var(--radius-lg);padding:32px}
+.info-note h4{font-size:16px;margin-bottom:14px}
+.info-note p{font-size:13.5px;color:rgba(255,255,255,0.75);line-height:1.7}
+
+/* CTA BAND */
+.cta-band{background:var(--navy);border-radius:var(--radius-lg);padding:72px 56px;text-align:center;position:relative;overflow:hidden}
+.cta-band h2{color:#fff}
+.cta-band p{color:rgba(255,255,255,0.7);margin:16px 0 36px;font-size:15.5px}
+.cta-band .btn-row{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+@media(max-width:640px){.cta-band{padding:48px 24px}}
+
+/* FOOTER */
+.site-footer{background:var(--navy);color:#fff;margin-top:0}
+.footer-inner{max-width:var(--maxw);margin:0 auto;padding:64px 32px 40px;display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:48px}
+@media(max-width:760px){.footer-inner{grid-template-columns:1fr;gap:32px}}
+.footer-logo{font-size:24px;font-weight:800;margin-bottom:12px}
+.footer-logo span{color:var(--gold)}
+.footer-tag{font-size:13.5px;color:rgba(255,255,255,0.55);font-style:italic;margin-bottom:18px}
+.footer-disclaimer{font-size:12.5px;color:rgba(255,255,255,0.45);line-height:1.7;max-width:360px}
+.footer-col h4{font-size:12.5px;text-transform:uppercase;letter-spacing:0.08em;color:rgba(255,255,255,0.5);margin-bottom:18px}
+.footer-col a,.footer-col span{display:block;font-size:14px;color:rgba(255,255,255,0.8);margin-bottom:12px}
+.footer-col a:hover{color:var(--gold)}
+.footer-bottom{border-top:1px solid rgba(255,255,255,0.1);padding:22px 32px;text-align:center;font-size:12.5px;color:rgba(255,255,255,0.45)}
+
+/* REVEAL */
+.reveal{opacity:0;transform:translateY(24px);transition:opacity .7s ease,transform .7s ease}
+.reveal.visible{opacity:1;transform:translateY(0)}
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="logo">ON<span>A</span></a>
+    <nav class="nav-links" id="navLinks">
+      <a href="index.html" class="nav-link" data-page="index">Kezdőlap</a>
+      <a href="szolgaltatasok.html" class="nav-link" data-page="szolgaltatasok">Szolgáltatások</a>
+      <a href="hogyan-mukodik.html" class="nav-link" data-page="hogyan-mukodik">Hogyan működik</a>
+      <a href="arazas.html" class="nav-link" data-page="arazas">Árazás</a>
+    </nav>
+    <div class="nav-cta">
+      <a href="jelentkezes.html" class="btn btn-primary btn-sm">Jelentkezés</a>
+      <button class="nav-toggle" id="navToggle" aria-label="Menü">☰</button>
+    </div>
+  </div>
+</header>
+
+<section style="padding-bottom:0">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div class="eyebrow" style="justify-content:center">Árazás</div>
+      <h2 class="h2">Válassza ki a <span class="accent">megfelelő szintet</span></h2>
+      <p class="lead" style="margin-top:14px">Átlátható, rugalmasan módosítható csomagok — havidíjas keretben, rejtett költségek nélkül. Az ONA Recovery és ONA Mama szolgáltatásoknál az egyéni igény miatt egyedi ajánlatot készítünk.</p>
+    </div>
+  </div>
+</section>
+
+<section style="padding-top:0">
+  <div class="wrap">
+    <div class="grid-3 reveal">
+      <div class="price-card">
+        <div class="price-dot" style="background:#4A7A5A"></div>
+        <div class="price-name">Essential</div>
+        <div class="price-quote">"Egy kis segítség a hétköznapokban"</div>
+        <div class="price-num">59 000 – 79 000 Ft</div>
+        <div class="price-freq">/ hónap · heti 1× · havi 4 látogatás</div>
+        <ul class="price-list">
+          <li>Alkalmanként 2–3 óra</li>
+          <li>Bevásárlás, gyógyszer kiváltás</li>
+          <li>Társaság, könnyű segítség</li>
+          <li>Rugalmas időpontok</li>
+        </ul>
+        <a href="jelentkezes.html#kereso" class="btn btn-outline btn-block">Ezt szeretném</a>
+      </div>
+      <div class="price-card featured">
+        <div class="price-badge">Legjobb választás</div>
+        <div class="price-dot" style="background:var(--gold)"></div>
+        <div class="price-name">Comfort</div>
+        <div class="price-quote">"Rendszeres, megbízható jelenlét"</div>
+        <div class="price-num">129 000 – 189 000 Ft</div>
+        <div class="price-freq">/ hónap · heti 2–3× · havi 8–12 látogatás</div>
+        <ul class="price-list">
+          <li>Minden alapszolgáltatás</li>
+          <li>Dedikált gondozó</li>
+          <li>Rendszeres visszajelzés</li>
+          <li>Prioritásos beosztás</li>
+        </ul>
+        <a href="jelentkezes.html#kereso" class="btn btn-primary btn-block">Ezt szeretném</a>
+      </div>
+      <div class="price-card">
+        <div class="price-dot" style="background:#A85040"></div>
+        <div class="price-name">Daily Support</div>
+        <div class="price-quote">"Mindennapi jelenlét"</div>
+        <div class="price-num">290 000 – 490 000 Ft</div>
+        <div class="price-freq">/ hónap · napi segítség</div>
+        <ul class="price-list">
+          <li>Napi dedikált gondozó</li>
+          <li>Teljes körű háztartási segítség</li>
+          <li>Havi értékelő visszajelzés</li>
+          <li>Sürgősségi elérhetőség</li>
+        </ul>
+        <a href="jelentkezes.html#kereso" class="btn btn-outline btn-block">Ezt szeretném</a>
+      </div>
+    </div>
+    <p style="text-align:center;margin-top:36px;font-size:13.5px;color:var(--text-mute)">Az árak tájékoztató jellegűek, a végleges ajánlatot a helyszín és az igényfelmérés alapján adjuk meg.</p>
+  </div>
+</section>
+
+<section style="background:var(--bg-alt)">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div class="eyebrow" style="justify-content:center">Gyakori kérdések</div>
+      <h2 class="h2">Árazással kapcsolatos <span class="accent">kérdések</span></h2>
+    </div>
+    <div class="reveal" style="max-width:760px;margin:0 auto" id="faqPricing">
+      <div class="faq-item">
+        <button class="faq-q">Mi történik, ha menet közben módosítanám a csomagot?<span class="faq-icon">+</span></button>
+        <div class="faq-a"><p>A csomagok bármikor, egy hónapos felmondási idővel módosíthatók vagy lemondhatók — Care Managerén keresztül egyszerűen jelezheti az igényét.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q">Milyen fizetési módokat fogadnak el?<span class="faq-icon">+</span></button>
+        <div class="faq-a"><p>Átutalással és bankkártyás fizetéssel egyaránt tudunk havidíjat fogadni, a jelentkezés után egyeztetett módon.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q">Van egyszeri, alkalmi szolgáltatás is?<span class="faq-icon">+</span></button>
+        <div class="faq-a"><p>Igen, egyedi, alkalmankénti segítség is kérhető a jelentkezési űrlapon — ebben az esetben óradíjas elszámolást javaslunk.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q">Mennyibe kerül az ONA Recovery vagy ONA Mama csomag?<span class="faq-icon">+</span></button>
+        <div class="faq-a"><p>Ezeknél a szolgáltatásoknál az igény időtartama és intenzitása nagyban eltérő lehet, ezért rövid konzultáció után adunk pontos árajánlatot.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="cta-band reveal">
+      <div class="eyebrow" style="justify-content:center;color:var(--gold)">Kezdjük el</div>
+      <h2 class="h2">Kérjen <span class="accent">személyre szabott</span> ajánlatot</h2>
+      <p>Töltse ki a rövid űrlapot, és munkatársunk 24 órán belül jelentkezik a pontos árajánlattal.</p>
+      <div class="btn-row"><a href="jelentkezes.html#kereso" class="btn btn-primary">Jelentkezés indítása</a></div>
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div>
+      <div class="footer-logo">ON<span>A</span></div>
+      <p class="footer-tag">"Care. Wherever life takes you."</p>
+      <p class="footer-disclaimer">Az ONA nem minősül egészségügyi szolgáltatónak, és nem végez orvosi vagy ápolói beavatkozást (gyógyszerbeadás, sebkezelés). Szolgáltatásaink otthoni jelenlétet, mindennapi és háztartási segítséget, valamint logisztikai támogatást nyújtanak.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Navigáció</h4>
+      <a href="index.html">Kezdőlap</a>
+      <a href="szolgaltatasok.html">Szolgáltatások</a>
+      <a href="hogyan-mukodik.html">Hogyan működik</a>
+      <a href="arazas.html">Árazás</a>
+      <a href="jelentkezes.html">Jelentkezés</a>
+    </div>
+    <div class="footer-col">
+      <h4>Kapcsolat</h4>
+      <a href="mailto:hello@ona.hu">hello@ona.hu</a>
+      <a href="tel:+3613456789">+36 1 345 6789</a>
+      <span>Budapest, Magyarország</span>
+    </div>
+  </div>
+  <div class="footer-bottom">© 2026 ONA. Minden jog fenntartva.</div>
+</footer>
+
+<script>
+document.querySelectorAll('.nav-link').forEach(function(a){
+  if(a.dataset.page === 'arazas'){ a.classList.add('active'); }
+});
+var navToggle = document.getElementById('navToggle');
+var navLinks = document.getElementById('navLinks');
+if(navToggle){ navToggle.addEventListener('click', function(){ navLinks.classList.toggle('open'); }); }
+document.querySelectorAll('.nav-link').forEach(function(a){ a.addEventListener('click', function(){ navLinks.classList.remove('open'); }); });
+
+var revealEls = document.querySelectorAll('.reveal');
+if(revealEls.length){
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('visible'); } });
+  }, {threshold:0.12});
+  revealEls.forEach(function(el){ io.observe(el); });
+}
+
+
+document.querySelectorAll('#faqPricing .faq-q').forEach(function(btn){
+  btn.addEventListener('click', function(){
+    var item = btn.closest('.faq-item');
+    var answer = item.querySelector('.faq-a');
+    var isOpen = item.classList.contains('open');
+    document.querySelectorAll('#faqPricing .faq-item').forEach(function(i){
+      i.classList.remove('open');
+      i.querySelector('.faq-a').style.maxHeight = null;
+    });
+    if(!isOpen){
+      item.classList.add('open');
+      answer.style.maxHeight = answer.scrollHeight + 'px';
+    }
+  });
+});
+</script>
+</body>
+</html>
